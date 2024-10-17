@@ -1,0 +1,94 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <LangVersion>latest</LangVersion>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Customization.ObjectModel</RootNamespace>
+    <AssemblyName>Customization.ObjectModel</AssemblyName>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <OutputPath>..\..\..\Exe\SolutionAssemblies\</OutputPath>
+    <AssemblySearchPaths>..\..\..\Exe\;..\..\..\Exe\SolutionAssemblies;$(AssemblySearchPaths)</AssemblySearchPaths>
+    <UseWPF>true</UseWPF>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Thermo.Framework.Core">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Thermo.Framework.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Thermo.Framework.Server">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Thermo.Framework.Server.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Thermo.Framework.Utilities">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Thermo.Framework.Utilities.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Thermo.SampleManager.Common">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Thermo.SampleManager.Common.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Thermo.SampleManager.Library">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Thermo.SampleManager.Library.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Thermo.SampleManager.ObjectModel">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Thermo.SampleManager.ObjectModel.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Thermo.SampleManager.Tasks.EntityDefinition">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Thermo.SampleManager.Tasks.EntityDefinition.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="7.0.3">
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0">
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0">
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+</Project>

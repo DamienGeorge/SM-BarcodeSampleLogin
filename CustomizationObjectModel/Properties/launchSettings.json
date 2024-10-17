@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "CustomizationObjectModel": {
+      "commandName": "Project"
+    },
+    "SampleManager21.2Exe": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Thermo\\SampleManager\\Server\\VGSM\\Exe\\SampleManager.exe",
+      "workingDirectory": "C:\\Thermo\\SampleManager\\Server\\VGSM\\Exe\\",
+      "nativeDebugging": true,
+      "sqlDebugging": false
+    }
+  }
+}
