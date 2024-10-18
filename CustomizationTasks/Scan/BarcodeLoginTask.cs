@@ -17,6 +17,7 @@ using Thermo.LabExecution.Tasks;
 using Thermo.SampleManager.ObjectModel.ImportHelpers;
 using Thermo.Framework.Core;
 using Thermo.SampleManager.Server;
+using Customization.ObjectModel;
 
 namespace Customization.Tasks
 {
@@ -89,14 +90,14 @@ namespace Customization.Tasks
                 throw new ArgumentException("Expected at least 3 parameters. Please separate each parameter by a comma");
             }
 
-            entityWorkflow = GetWorkflowById(workflowGUID, workflowVersion);
+            entityWorkflow = EntityManager.GetWorkflowById(workflowGUID, workflowVersion);
 
             if (!(entityWorkflow.WorkflowType.PhraseId == PhraseWflowType.PhraseIdSAMPLE))
             {
                 throw new ArgumentException($"Workflow {entityWorkflow.NameWithVersion()} is not a {PhraseWflowType.PhraseIdSAMPLE} Workflow!");
             }
 
-            entityTemplate = GetEntityTemplateById(entityTemplateId);
+            entityTemplate = EntityManager.GetEntityTemplateById(entityTemplateId);
 
             if (CheckFieldToScanExists(entityTemplate, scannedToField) == false)
             {
@@ -108,23 +109,6 @@ namespace Customization.Tasks
         }
 
         #region Custom Methods
-
-        private EntityTemplateInternal GetEntityTemplateById(string entityTemplateId)
-        {
-            return EntityManager.SelectLatestVersion<EntityTemplateInternal>(entityTemplateId) ?? throw new NullReferenceException($"Could not find EntityTemplate with id : {entityTemplateId}");
-        }
-
-        private Workflow GetWorkflowById(string workflowGUID, string workflowVersion)
-        {
-            if (String.IsNullOrEmpty(workflowVersion))
-            {
-                return EntityManager.SelectLatestVersion<Workflow>(new Identity(workflowGUID)) ?? throw new NullReferenceException($"Could not find an active workflow with id : {workflowGUID}");
-            }
-            else
-            {
-                return EntityManager.Select<Workflow>(new Identity(workflowGUID, workflowVersion)) ?? throw new NullReferenceException($"Could not find workflow with id : {workflowGUID} and version : {workflowVersion}");
-            }
-        }
         private bool CheckFieldToScanExists(EntityTemplateInternal entityTemplate, string scannedToField)
         {
             return entityTemplate.EntityTemplateProperties.Contains(scannedToField);
@@ -147,9 +131,9 @@ namespace Customization.Tasks
         {
             IList<IEntity> newEntities = new List<IEntity>();
             //newEntities = CreateCopyOfEntities();
-            EntityManager.Transaction.Clear();
 
             newEntities = workflowHelper.RunWorkflow(entityWorkflow, 1);
+            EntityManager.Transaction.Clear();
 
             foreach (var scannedValue in scannedValues)
             {
@@ -178,6 +162,7 @@ namespace Customization.Tasks
                     scannedSample.Barcode = scannedValue;
                     scannedSample.CreatedOn = DateTime.Now;
                     scannedSample.CreatedBy = (PersonnelBase)Library.Environment.CurrentUser;
+                    scannedSample.WorkflowGuid = entityWorkflow.WorkflowGuid;
 
                     EntityManager.Transaction.Add(scannedSample);
                 }

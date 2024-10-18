@@ -1,27 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
 using Thermo.Framework.Core;
 using Thermo.SampleManager.Common.Data;
 using Thermo.SampleManager.Core.Exceptions;
 using Thermo.SampleManager.Internal.ObjectModel;
 using Thermo.SampleManager.Library;
 using Thermo.SampleManager.Library.ClientControls;
-using Thermo.SampleManager.Library.ClientControls.Browse;
 using Thermo.SampleManager.Library.DesignerRuntime;
 using Thermo.SampleManager.Library.EntityDefinition;
 using Thermo.SampleManager.Library.FormDefinition;
 using Thermo.SampleManager.ObjectModel;
-using Thermo.SampleManager.Server;
 using Thermo.SampleManager.Tasks;
-using static System.Windows.Forms.AxHost;
-using Timer = System.Timers.Timer;
-using Environment = System.Environment;
 using System.Drawing;
-using Thermo.SampleManager.Common.Workflow;
-using Thermo.SampleManager.Server.Workflow;
 using Customization.Tasks;
-using System.Linq;
+using Customization.Tasks.Helper_Classes;
 
 namespace ISLAND.Tasks
 {
@@ -35,15 +26,8 @@ namespace ISLAND.Tasks
         string scannedToField = String.Empty;
         private string m_Title;
 
-        private IQuery m_CriteriaQuery;
-        private bool m_InitialisingCriteria;
-
         /// <summary>Indicate that a fatal error occurred - also used as a quick way out</summary>
         protected bool FatalErrorOccurred;
-
-        private Dictionary<EntityBrowse, IEntityCollection> m_CriteriaBrowseLookup;
-
-        private IWorkflowEventService m_WorkflowEventService;
         #endregion
 
         #region Constants
@@ -138,11 +122,12 @@ namespace ISLAND.Tasks
 
         protected override void MainFormLoaded()
         {
+
             if (Context.LaunchMode == GenericLabtableTask.ModifyOption)
             {
+                IEntityCollection sampleCollection = EntityManager.CreateEntityCollection<SampleBase>();
                 m_Form.Title = m_Title;
 
-                IEntityCollection sampleCollection = EntityManager.CreateEntityCollection<SampleBase>();
                 foreach (ScannedSampleBase selectedItem in Context.SelectedItems)
                 {
                     entityTemplate = (EntityTemplateInternal)selectedItem.EntityTemplate;
@@ -156,17 +141,13 @@ namespace ISLAND.Tasks
                     string serializedJson = selectedItem.ClobToString(PendingSamplePropertyNames.Clob);
                     SampleBase deserializedSample = EntityManager.CreateEntity<SampleBase>();
                     EntityTemplateHelper.DeserializeJSONUsingEntityTemplate(selectedItem, entityTemplate, serializedJson, deserializedSample);
-
                     sampleCollection.Add(deserializedSample);
 
                 }
+
+                ExplorerGridHelper gridHelper = new ExplorerGridHelper(EntityManager, Library, m_Form.SampleUnboundGrid, BrowseFactory);
+                gridHelper.PopulateColumns(sampleCollection);
             }
-
-            AddPropertyColumns();
-            m_CriteriaBrowseLookup = new Dictionary<EntityBrowse, IEntityCollection>();
-
-            //m_Form.ScanBox.EditValueChanged += ScanBox_EditValueChanged;
-            //m_Form.SampleUnboundGrid.RowAdded += SampleUnboundGrid_RowAdded;
         }
 
         /// <summary>
@@ -182,14 +163,6 @@ namespace ISLAND.Tasks
             return true;
         }
 
-        /// <summary>
-        /// Removes the row.
-        /// </summary>
-        /// <returns></returns>
-        private void ClearRows()
-        {
-            m_UnboundGrid.ClearRows();
-        }
 
         /// <summary>
         /// Applies the changes.
@@ -210,129 +183,6 @@ namespace ISLAND.Tasks
                 Logger.Error(ex.Message, ex);
             }
         }
-
-        /// <summary>
-		/// Populates the default columns.
-		/// </summary>
-		/// <param name="grid">The grid.</param>
-		/// <param name="row">The row.</param>
-		/// <param name="entity">The entity.</param>
-		private void PopulateDefaultColumns(UnboundGrid grid, UnboundGridRow row, IEntity entity)
-        {
-            //if (grid == m_JobPropertiesGrid)
-            //{
-            //    // Set Job Name
-
-            //    JobHeader jobHeader = (JobHeader)entity;
-            //    row[JobNameColumn] = jobHeader.JobName;
-
-            //    if (m_LotDetails != null)
-            //    {
-            //        jobHeader.LotId = m_LotDetails;
-            //        row[LotIdColumn] = jobHeader.LotId;
-            //    }
-
-            //    return;
-            //}
-
-            //if (grid == m_SamplePropertiesGrid)
-            //{
-            //TODO - Only need the part here
-            //Sample sample = (Sample)entity;
-
-            //if (entityWorkflow.typ)
-            //{
-            //    // Set Job Name
-
-            //    row[JobNameColumn] = sample.JobName.JobName;
-            //}
-
-            //// Set Sample ID
-
-            //row[SampleIdColumn] = sample.IdText;
-            //    return;
-            //}
-
-            //// This is the test grid
-
-            //Test test = (Test)entity;
-
-            //row[SampleIdColumn] = test.Sample.IdText;
-            //row[TestIdColumn] = test.TestCount == 1 ? test.Analysis.VersionedAnalysisName : $"{test.Analysis.VersionedAnalysisName}/{test.TestCount}";
-            //row[AssignColumn] = test.Assign;
-        }
-
-        #region Specific Type Prompts
-        /// <summary>
-        /// Setup the grid column
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        /// <param name="templateProperty">The template property.</param>
-        /// <param name="row">The row.</param>
-        /// <param name="column">The column.</param>
-        private void SetupGridColumn(IEntity entity, EntityTemplatePropertyInternal templateProperty, UnboundGridRow row, UnboundGridColumn column)
-        {
-            //if (entity.EntityType == TestBase.EntityName)
-            //{
-            //    SetupTestGridColumnInternal((Test)entity, templateProperty, row, column);
-            //    SetupTestGridColumn((Test)entity, templateProperty, row, column);
-            //    return;
-            //}
-
-            //if (entity.EntityType == JobHeaderBase.EntityName)
-            //{
-            //    SetupJobGridColumn((JobHeader)entity, templateProperty, row, column);
-            //    return;
-            //}
-
-            if (entity.EntityType == SampleBase.EntityName)
-            {
-                SetupSampleGridColumnInternal(templateProperty, row, column);
-                SetupSampleGridColumn((Sample)entity, templateProperty, row, column);
-            }
-        }
-
-        /// <summary>
-        /// Setup the sample grid column.
-        /// </summary>
-        /// <param name="templateProperty">The template property.</param>
-        /// <param name="row">The row.</param>
-        /// <param name="column">The column.</param>
-        private static void SetupSampleGridColumnInternal(EntityTemplatePropertyInternal templateProperty, UnboundGridRow row, UnboundGridColumn column)
-        {
-            // Spreadsheet login does not allow you to change the test schedule during login.
-
-            if (templateProperty.PropertyName == SamplePropertyNames.TestSchedule)
-            {
-                column.DisableCell(row, DisabledCellDisplayMode.GreyShowContents);
-            }
-        }
-
-        /// <summary>
-		/// Setup the sample grid column.
-		/// </summary>
-		/// <param name="sample">The sample.</param>
-		/// <param name="templateProperty">The template property.</param>
-		/// <param name="row">The row.</param>
-		/// <param name="column">The column.</param>
-		protected virtual void SetupSampleGridColumn(Sample sample, EntityTemplatePropertyInternal templateProperty, UnboundGridRow row, UnboundGridColumn column)
-        {
-            if (templateProperty.PropertyName == SamplePropertyNames.JobName)
-            {
-                if (sample.IsSplit)
-                    column.DisableCell(row, DisabledCellDisplayMode.GreyShowContents);
-                else
-                {
-                    var columnValue = row.GetValue(column.Name);
-
-                    if (!string.IsNullOrWhiteSpace(columnValue?.ToString()))
-                    {
-                        column.DisableCell(row, DisabledCellDisplayMode.GreyShowContents);
-                    }
-                }
-            }
-        }
-        #endregion
 
         protected override void SetupTask()
         {

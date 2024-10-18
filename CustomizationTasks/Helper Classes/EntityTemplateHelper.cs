@@ -1,12 +1,14 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Nodes;
 using Thermo.Framework.Core;
 using Thermo.SampleManager.Common.Data;
 using Thermo.SampleManager.Internal.ObjectModel;
 using Thermo.SampleManager.Library.EntityDefinition;
 using Thermo.SampleManager.ObjectModel;
 using Thermo.SampleManager.Server;
+using Customization.ObjectModel;
 
 namespace Customization.Tasks
 {
@@ -35,14 +37,24 @@ namespace Customization.Tasks
             //SampleBase deserializedSample = JsonConvert.DeserializeObject<SampleBase>(JSON);
             try
             {
+                if (entity.GetEntity("EntityTemplate") is null)
+                {
+                    entity.Set("EntityTemplate", entityTemplate);
+                }
+
                 foreach (EntityTemplateProperty field in entityTemplate.EntityTemplateProperties)
                 {
-                    entity.Set(field.Name, deserializedJSON[field.Name]);
+                    if (String.IsNullOrEmpty(deserializedJSON[field.Name]) == false)
+                    {
+                        ISchemaField schemaField = entity.FindSchemaField(field.Name);
+
+                        entity.SetFieldByType(field.Name, schemaField, deserializedJSON[field.Name]);
+                    }
                 }
             }
             catch (Exception ex)
             {
-                return null;
+                //If entity Template is modified, should anything be done?
             }
 
             ////map object to sample fields

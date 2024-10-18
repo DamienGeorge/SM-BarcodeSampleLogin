@@ -20,12 +20,12 @@ namespace Customization.Tasks.Helper_Classes
 {
     public class ExplorerGridHelper
     {
-        private readonly EntityManager _EntityManager;
+        private readonly IEntityManager _EntityManager;
         private readonly StandardLibrary _Library;
         private readonly UnboundGrid m_UnboundGrid;
         private readonly BrowseFactory _BrowseFactory;
 
-        public ExplorerGridHelper(EntityManager entityManager, StandardLibrary library, UnboundGrid unboundGrid, BrowseFactory browseFactory)
+        public ExplorerGridHelper(IEntityManager entityManager, StandardLibrary library, UnboundGrid unboundGrid, BrowseFactory browseFactory)
         {
             _EntityManager = entityManager;
             _Library = library;

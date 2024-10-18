@@ -40,6 +40,10 @@
       <HintPath>Thermo.SampleManager.Common.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Thermo.SampleManager.Internal.ObjectModel">
+      <HintPath>..\..\..\Exe\Thermo.SampleManager.Internal.ObjectModel.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Thermo.SampleManager.Library">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Thermo.SampleManager.Library.dll</HintPath>
@@ -48,6 +52,10 @@
     <Reference Include="Thermo.SampleManager.ObjectModel">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Thermo.SampleManager.ObjectModel.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Thermo.SampleManager.Server.Workflow">
+      <HintPath>..\..\..\Exe\Thermo.SampleManager.Server.Workflow.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Thermo.SampleManager.Tasks.EntityDefinition">
