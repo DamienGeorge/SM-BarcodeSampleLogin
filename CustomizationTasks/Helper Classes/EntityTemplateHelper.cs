@@ -37,7 +37,8 @@ namespace Customization.Tasks
             //SampleBase deserializedSample = JsonConvert.DeserializeObject<SampleBase>(JSON);
             try
             {
-                if (entity.GetEntity("EntityTemplate") is null)
+                var currentEntityTemplate = entity.GetEntity("EntityTemplate");
+                if (currentEntityTemplate is null || String.IsNullOrEmpty(currentEntityTemplate.Identity))
                 {
                     entity.Set("EntityTemplate", entityTemplate);
                 }

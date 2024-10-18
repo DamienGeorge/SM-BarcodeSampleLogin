@@ -72,7 +72,7 @@ namespace Customization.Tasks
 
         private void MapSampleFromEntitytemplate(IEntity entity, ScannedSampleBase sample)
         {
-            EntityTemplateHelper.DeserializeJSONUsingEntityTemplate(sample, (EntityTemplateInternal)sample.EntityTemplate, sample.ClobToString(PendingSamplePropertyNames.Clob), entity);
+            EntityTemplateHelper.DeserializeJSONUsingEntityTemplate(sample, (EntityTemplateInternal)sample.EntityTemplate, sample.ClobToString(ScannedSamplePropertyNames.Clob), entity);
 
             EntityManager.Transaction.Add(entity);
         }

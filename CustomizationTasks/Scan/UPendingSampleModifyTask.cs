@@ -21,7 +21,7 @@ namespace ISLAND.Tasks
     {
         #region Member variables
         private EntityTemplateInternal entityTemplate;
-        private FormSampleReceipt m_Form;
+        private FormScannedSampleModify m_Form;
         private UnboundGrid m_UnboundGrid;
         string scannedToField = String.Empty;
         private string m_Title;
@@ -66,46 +66,6 @@ namespace ISLAND.Tasks
         /// </summary>
         public const string CommandRemove = "REMOVE";
 
-        /// <summary>
-        /// The beep error
-        /// </summary>
-        public const string BeepErrorFile = "beeperror.wav";
-
-        /// <summary>
-        /// The beep information
-        /// </summary>
-        public const string BeepInfoFile = "beepinfo.wav";
-
-        /// <summary>
-        /// The beep success
-        /// </summary>
-        public const string BeepSuccessFile = "beepsuccess.wav";
-
-        /// <summary>
-        /// The sound directory
-        /// </summary>
-        protected const string SoundDirectory = "sound";
-
-        /// <summary>
-        /// The resource logical
-        /// </summary>
-        protected const string ResourceLogical = "smp$resource";
-
-        /// <summary>
-        /// The information color
-        /// </summary>
-        protected readonly Color ColorInfo = Color.CornflowerBlue;
-
-        /// <summary>
-        /// The error color
-        /// </summary>
-        protected readonly Color ColorError = Color.Firebrick;
-
-        /// <summary>
-        /// The success color
-        /// </summary>
-        protected readonly Color ColorSuccess = Color.SeaGreen;
-
         #endregion
 
         public UPendingSampleModifyTask()
@@ -115,7 +75,7 @@ namespace ISLAND.Tasks
 
         protected override void MainFormCreated()
         {
-            m_Form = (FormSampleReceipt)MainForm;
+            m_Form = (FormScannedSampleModify)MainForm;
             m_UnboundGrid = m_Form.SampleUnboundGrid;
             m_Title = GetFormName();
         }
@@ -138,7 +98,7 @@ namespace ISLAND.Tasks
                     //    Context.SelectedItems.ActiveItems.Cast<PendingSampleBase>().Any(x => x.EntityTemplate != entityTemplate) ?? throw new SampleManagerError("EntityTemplates are different");
                     //}
 
-                    string serializedJson = selectedItem.ClobToString(PendingSamplePropertyNames.Clob);
+                    string serializedJson = selectedItem.ClobToString(ScannedSamplePropertyNames.Clob);
                     SampleBase deserializedSample = EntityManager.CreateEntity<SampleBase>();
                     EntityTemplateHelper.DeserializeJSONUsingEntityTemplate(selectedItem, entityTemplate, serializedJson, deserializedSample);
                     sampleCollection.Add(deserializedSample);
