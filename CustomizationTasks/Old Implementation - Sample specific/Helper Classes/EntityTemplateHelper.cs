@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Nodes;
-using Thermo.Framework.Core;
 using Thermo.SampleManager.Common.Data;
 using Thermo.SampleManager.Internal.ObjectModel;
 using Thermo.SampleManager.Library.EntityDefinition;
@@ -12,10 +10,19 @@ using Customization.ObjectModel;
 
 namespace Customization.Tasks
 {
+    /// <summary>
+    /// Utility class containing Helper methods for EntityTemplate Processing
+    /// </summary>
     public static class EntityTemplateHelper
     {
         #region Serialization
 
+        /// <summary>
+        /// Serialize Entity to JSON using Entity Template
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="entityTemplate"></param>
+        /// <returns></returns>
         public static string SerializeJSONUsingEntityTemplate(IEntity entity, EntityTemplateInternal entityTemplate)
         {
             IDictionary<string, string> fields = new Dictionary<string, string>();
@@ -30,11 +37,18 @@ namespace Customization.Tasks
             return serializedJSON;
         }
 
+        /// <summary>
+        /// Deserialize Entity from JSON using Entity Template
+        /// </summary>
+        /// <param name="pendingSample"></param>
+        /// <param name="entityTemplate"></param>
+        /// <param name="JSON"></param>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public static IEntity DeserializeJSONUsingEntityTemplate(ScannedSampleBase pendingSample, EntityTemplateInternal entityTemplate, string JSON, IEntity entity)
         {
             IDictionary<string, string> deserializedJSON = JsonConvert.DeserializeObject<Dictionary<string, string>>(JSON);
 
-            //SampleBase deserializedSample = JsonConvert.DeserializeObject<SampleBase>(JSON);
             try
             {
                 var currentEntityTemplate = entity.GetEntity("EntityTemplate");
@@ -57,12 +71,6 @@ namespace Customization.Tasks
             {
                 //If entity Template is modified, should anything be done?
             }
-
-            ////map object to sample fields
-            //foreach(var entry in deserializedJSON)
-            //{
-
-            //}
 
             return entity;
 

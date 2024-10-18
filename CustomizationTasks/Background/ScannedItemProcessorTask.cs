@@ -7,10 +7,14 @@ using Thermo.SampleManager.Server;
 
 namespace Customization.Tasks
 {
-
+    /// <summary>
+    /// Background Task to Process the entries in Table ScannedEntities
+    /// </summary>
     [SampleManagerTask(nameof(ScannedItemProcessorTask))]
     public class ScannedItemProcessorTask : SampleManagerTask, IBackgroundTask
     {
+
+        #region Overrides
 
         /// <summary>
         /// Entry Point to Debug task interactively
@@ -21,7 +25,9 @@ namespace Customization.Tasks
 
             Launch();
         }
+        #endregion
 
+        #region Custom Methods
         /// <summary>
         /// Entry point for Background Task
         /// </summary>
@@ -79,13 +85,6 @@ namespace Customization.Tasks
             return EntityManager.Select(scannedSampleQuery);
         }
 
-        /// <summary>
-        /// Delete the Scanned Samples Marked for Deletion
-        /// </summary>
-        /// <exception cref="NotImplementedException"></exception>
-        private void DeleteCompletedSamples()
-        {
-            throw new NotImplementedException();
-        }
+        #endregion
     }
 }

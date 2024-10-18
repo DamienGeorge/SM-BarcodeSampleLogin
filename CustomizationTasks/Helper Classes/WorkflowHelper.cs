@@ -8,14 +8,22 @@ using Thermo.SampleManager.Server.Workflow;
 
 namespace Customization.Tasks
 {
+    /// <summary>
+    /// Utility class containing Helper methods for Workflow Processing
+    /// </summary>
     public class WorkflowHelper
     {
+        #region Global Variables
         public StandardLibrary Library { get; }
+        #endregion
 
+        #region Constructor
         public WorkflowHelper(StandardLibrary library)
         {
             Library = library;
         }
+        #endregion
+
         #region Workflow
 
         /// <summary>

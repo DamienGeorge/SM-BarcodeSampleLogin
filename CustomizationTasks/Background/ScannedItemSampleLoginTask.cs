@@ -5,20 +5,25 @@ using Thermo.SampleManager.Common.Data;
 using Thermo.SampleManager.Library;
 using Thermo.SampleManager.Library.EntityDefinition;
 using Thermo.SampleManager.ObjectModel;
-using Thermo.SampleManager.Server;
 
 namespace Customization.Tasks
 {
-
+    /// <summary>
+    /// Specialized Task to Create Entity for the scanned text
+    /// Called from ScannedItemProcessorTask
+    /// </summary>
     [SampleManagerTask(nameof(ScannedItemSampleLoginTask))]
     public class ScannedItemSampleLoginTask : SampleManagerTask
     {
+        #region Global Variables
         private string m_InputValue;
         private string workflowId;
         private string scannedFieldName;
         private string jobName;
         JobHeaderBase jobHeader;
+        #endregion
 
+        #region Overrides
         /// <summary>
         /// Entry Point for task
         /// </summary>
@@ -55,6 +60,7 @@ namespace Customization.Tasks
             try
             {
                 IEntity updatedSample = Run(workflow, scannedEntity);
+
                 EntityManager.Commit();
                 Exit();
             }
@@ -63,7 +69,9 @@ namespace Customization.Tasks
                 throw ex;
             }
         }
+        #endregion
 
+        #region Custom Methods
         /// <summary>
         /// Run the Workflow for the Scanned entity
         /// </summary>
@@ -119,5 +127,6 @@ namespace Customization.Tasks
         {
             throw new NotImplementedException();
         }
+        #endregion
     }
 }

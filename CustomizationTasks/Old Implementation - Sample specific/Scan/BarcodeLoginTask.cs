@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Thermo.SampleManager.Common.Data;
 using Thermo.SampleManager.Internal.ObjectModel;
 using Thermo.SampleManager.Library;
@@ -12,11 +9,6 @@ using Thermo.SampleManager.Library.EntityDefinition;
 using Thermo.SampleManager.Library.FormDefinition;
 using Thermo.SampleManager.ObjectModel;
 using Thermo.SampleManager.Tasks;
-using System.Linq;
-using Thermo.LabExecution.Tasks;
-using Thermo.SampleManager.ObjectModel.ImportHelpers;
-using Thermo.Framework.Core;
-using Thermo.SampleManager.Server;
 using Customization.ObjectModel;
 
 namespace Customization.Tasks

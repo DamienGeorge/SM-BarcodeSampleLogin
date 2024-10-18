@@ -1,20 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Thermo.Framework.Core;
 using Thermo.SampleManager.Common.Data;
-using Thermo.SampleManager.Internal.ObjectModel;
-using Thermo.SampleManager.Library.ClientControls.Browse;
 using Thermo.SampleManager.Library.ClientControls;
-using Thermo.SampleManager.Library;
 using Thermo.SampleManager.Library.DesignerRuntime;
-using Thermo.SampleManager.ObjectModel;
-using Thermo.SampleManager.Server;
 using System.Timers;
 using Environment = System.Environment;
-using ISLAND.Tasks;
 
 namespace Customization.Tasks
 {

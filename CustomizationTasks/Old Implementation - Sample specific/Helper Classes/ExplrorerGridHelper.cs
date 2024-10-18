@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Thermo.SampleManager.Common.Data;
+﻿using Thermo.SampleManager.Common.Data;
 using Thermo.SampleManager.Internal.ObjectModel;
 using Thermo.SampleManager.Library.ClientControls.Browse;
 using Thermo.SampleManager.Library.ClientControls;
@@ -11,13 +6,13 @@ using Thermo.SampleManager.Library.DesignerRuntime;
 using Thermo.SampleManager.Library;
 using Thermo.SampleManager.ObjectModel;
 using Thermo.SampleManager.Server;
-using Thermo.SampleManager.Library.EntityDefinition;
-using Thermo.SampleManager.Core.Definition;
 using Thermo.Framework.Core;
-using System.Windows.Controls;
 
 namespace Customization.Tasks.Helper_Classes
 {
+    /// <summary>
+    /// Utility class containing Helper methods for Explorer Grid Processing - Not Required
+    /// </summary>
     public class ExplorerGridHelper
     {
         private readonly IEntityManager _EntityManager;
@@ -25,6 +20,7 @@ namespace Customization.Tasks.Helper_Classes
         private readonly UnboundGrid m_UnboundGrid;
         private readonly BrowseFactory _BrowseFactory;
 
+        #region Constructor
         public ExplorerGridHelper(IEntityManager entityManager, StandardLibrary library, UnboundGrid unboundGrid, BrowseFactory browseFactory)
         {
             _EntityManager = entityManager;
@@ -32,6 +28,9 @@ namespace Customization.Tasks.Helper_Classes
             m_UnboundGrid = unboundGrid;
             _BrowseFactory = browseFactory;
         }
+        #endregion
+
+        #region Custom Methods
 
         public void PopulateColumns(IEntityCollection entities)
         {
@@ -303,5 +302,6 @@ namespace Customization.Tasks.Helper_Classes
         {
             return (EntityTemplateInternal)entity.GetEntity("EntityTemplate");
         }
+        #endregion
     }
 }

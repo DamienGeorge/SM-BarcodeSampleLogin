@@ -1,24 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 using Thermo.SampleManager.Common.Data;
 using Thermo.SampleManager.Internal.ObjectModel;
 using Thermo.SampleManager.ObjectModel;
-using Thermo.SampleManager.Server;
 
 namespace Customization.ObjectModel
 {
+    /// <summary>
+    /// Class contains extenstion methods for Processing Entities
+    /// </summary>
     public static class EntityExtensions
     {
-        //public static IDataType GetEntityType(this EntityTemplateProperty entityTemplateProperty)
-        //{
-        //    ISchemaField schemaField = entityTemplateProperty.FindSchemaField(entityTemplateProperty.Name);
-        //    return schemaField.DataType;
-        //}
-
+        #region Entity Extensions
         public static void SetFieldByType(this IEntity entity, string PropertyName, ISchemaField schemaField, string value)
         {
             switch (schemaField.DataType.SMType)
@@ -70,13 +62,30 @@ namespace Customization.ObjectModel
                     break;
             }
         }
+        #endregion
 
+        #region EntityManager Extensions
+        /// <summary>
+        /// Method to get Entity Template by EntityTemplate Id
+        /// </summary>
+        /// <param name="entityManager"></param>
+        /// <param name="entityTemplateId"></param>
+        /// <returns></returns>
+        /// <exception cref="NullReferenceException"></exception>
         public static EntityTemplateInternal GetEntityTemplateById(this IEntityManager entityManager, string entityTemplateId)
         {
             return entityManager.SelectLatestVersion<EntityTemplateInternal>(entityTemplateId) ?? throw new NullReferenceException($"Could not find EntityTemplate with id : {entityTemplateId}");
         }
 
-        public static Workflow GetWorkflowById(this IEntityManager entityManager, string workflowGUID, string workflowVersion= "")
+        /// <summary>
+        /// Method to get Workflow by WorkflowID and optionally Workflow Version
+        /// </summary>
+        /// <param name="entityManager"></param>
+        /// <param name="workflowGUID"></param>
+        /// <param name="workflowVersion"></param>
+        /// <returns></returns>
+        /// <exception cref="NullReferenceException"></exception>
+        public static Workflow GetWorkflowById(this IEntityManager entityManager, string workflowGUID, string workflowVersion = "")
         {
             if (String.IsNullOrEmpty(workflowVersion))
             {
@@ -87,5 +96,6 @@ namespace Customization.ObjectModel
                 return entityManager.Select<Workflow>(new Identity(workflowGUID, workflowVersion)) ?? throw new NullReferenceException($"Could not find workflow with id : {workflowGUID} and version : {workflowVersion}");
             }
         }
+        #endregion
     }
 }

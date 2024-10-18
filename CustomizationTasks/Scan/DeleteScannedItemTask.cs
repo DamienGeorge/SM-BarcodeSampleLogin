@@ -4,9 +4,13 @@ using Thermo.SampleManager.Library.DesignerRuntime;
 
 namespace Customization.Tasks
 {
+    /// <summary>
+    /// Task to Delete incorrect records from Table ScannedEntity
+    /// </summary>
     [SampleManagerTask("DeleteScannedItemTask")]
     public class DeleteScannedItemTask : SampleManagerTask
     {
+        #region Overrides
         protected override void SetupTask()
         {
             IEntityCollection entitiesToDelete = Context.SelectedItems;
@@ -19,5 +23,6 @@ namespace Customization.Tasks
 
             EntityManager.Commit();
         }
+        #endregion
     }
 }

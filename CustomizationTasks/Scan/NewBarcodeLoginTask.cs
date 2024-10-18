@@ -9,14 +9,21 @@ using Thermo.SampleManager.Tasks;
 
 namespace Customization.Tasks
 {
+    /// <summary>
+    /// Task for creating entities scanned using Scanner into Table Scanned Entities
+    /// TODO - Needs a better task name
+    /// </summary>
     [SampleManagerTask("NewBarcodeLoginTask")]
     public class NewBarcodeLoginTask : DefaultFormTask
     {
+        #region Global Variables
         private FormBarcodeLogin m_Form;
         private BarcodeLogin barcode;
         string _taskName = String.Empty;
         string _taskParameters = String.Empty;
+        #endregion
 
+        #region Overrides
         protected override void MainFormCreated()
         {
             base.MainFormCreated();
@@ -33,7 +40,14 @@ namespace Customization.Tasks
 
             ReadParameters();
         }
+        #endregion
 
+        #region Custom Methods
+        /// <summary>
+        /// Read all the parameters from the task
+        /// </summary>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         private void ReadParameters()
         {
             var menuparams = Context.MenuItem.Get(MasterMenuPropertyNames.Parameters)?.ToString();
@@ -58,9 +72,11 @@ namespace Customization.Tasks
             }
         }
 
-        #region Custom Methods
-
-
+        /// <summary>
+        /// Logic to process Scan box value change event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ScanBox_EditValueChanged(object sender, Thermo.SampleManager.Library.ClientControls.TextChangedEventArgs e)
         {
             barcode.Scan(sender, e);
@@ -69,11 +85,15 @@ namespace Customization.Tasks
             {
                 var scannedValues = barcode.scannedValues;
 
-                CreateScannedSamples(scannedValues);
+                CreateScannedEntities(scannedValues);
             }
         }
 
-        private void CreateScannedSamples(List<string> scannedValues)
+        /// <summary>
+        /// Create the Scanned Entities
+        /// </summary>
+        /// <param name="scannedValues"></param>
+        private void CreateScannedEntities(List<string> scannedValues)
         {
             foreach (var scannedValue in scannedValues)
             {
