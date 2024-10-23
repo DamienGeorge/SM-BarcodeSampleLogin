@@ -55,15 +55,15 @@ namespace Customization.Tasks
                     };
 
                     //Transactions cannot span across tasks
-                    var result = Library.Task.CreateTaskAndWait(scannedItem.TaskName, scannedItem.TaskParameters, entityCollection);
+                    var result = (IEntity)Library.Task.CreateTaskAndWait(scannedItem.TaskName, scannedItem.TaskParameters, entityCollection);
 
-
+                    //EntityManager.Transaction.Add(result);
                     scannedItem.SetStatus(PhraseUPenStat.PhraseIdS);
                 }
                 catch (Exception ex)
                 {
                     scannedItem.ErrorContent = ex.Message;
-                    scannedItem.SetStatus(PhraseUPenStat.PhraseIdS);
+                    scannedItem.SetStatus(PhraseUPenStat.PhraseIdE);
                 }
 
                 EntityManager.Transaction.Add(scannedItem);

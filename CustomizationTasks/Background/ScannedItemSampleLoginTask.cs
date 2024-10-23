@@ -59,9 +59,8 @@ namespace Customization.Tasks
 
             try
             {
-                IEntity updatedSample = Run(workflow, scannedEntity);
+                Run(workflow, scannedEntity);
 
-                EntityManager.Commit();
                 Exit();
             }
             catch (Exception ex)
@@ -78,30 +77,40 @@ namespace Customization.Tasks
         /// <param name="workflow"></param>
         /// <param name="scannedEntity"></param>
         /// <returns></returns>
-        public IEntity Run(Workflow workflow, ScannedEntityBase scannedEntity)
+        public void Run(Workflow workflow, ScannedEntityBase scannedEntity)
         {
-            WorkflowHelper workflowHelper = new WorkflowHelper(Library);
-
-            IList<IEntity> createdSamples = workflowHelper.RunWorkflow(workflow, 1);
-
-            foreach (SampleBase sample in createdSamples)
+            try
             {
-                ISchemaField schemaField = sample.FindSchemaField(scannedFieldName);
+                WorkflowHelper workflowHelper = new WorkflowHelper(Library);
 
-                sample.SetFieldByType(scannedFieldName, schemaField, scannedEntity.ScannedText);
-                sample.UScannedBy = scannedEntity.ScannedBy;
-                sample.UScannedOn = scannedEntity.ScannedOn;
+                IList<IEntity> createdSamples = workflowHelper.RunWorkflow(workflow, 1);
 
-                if (jobHeader != null)
+                EntityManager.Transaction.Clear();
+
+                foreach (SampleBase sample in createdSamples)
                 {
-                    sample.JobName = jobHeader;
+                    ISchemaField schemaField = sample.FindSchemaField(scannedFieldName);
+
+                    sample.SetFieldByType(scannedFieldName, schemaField, scannedEntity.ScannedText);
+                    sample.UScannedBy = scannedEntity.ScannedBy;
+                    sample.UScannedOn = scannedEntity.ScannedOn;
+
+                    if (jobHeader != null)
+                    {
+                        sample.JobName = jobHeader;
+                    }
+
+                    EntityManager.Transaction.Add(sample);
                 }
-
-                EntityManager.Transaction.Add(sample);
-                return sample;
+                EntityManager.Commit();
             }
+            catch (Exception ex)
+            {
+                Logger.Error(ex.Message);
+                Logger.Error(ex.InnerException);
 
-            return default;
+                throw ex;
+            }
         }
 
         /// <summary>

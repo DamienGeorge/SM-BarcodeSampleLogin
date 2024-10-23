@@ -70,6 +70,12 @@ namespace Customization.Tasks
             {
                 throw new ArgumentException("Expected at least 1 parameter");
             }
+
+            if (Context.TaskParameters != null && Context.TaskParameters.Length > 1)
+            {
+                var contextTaskParameters = String.Join(',', Context.TaskParameters);
+                _taskParameters += contextTaskParameters.Substring(contextTaskParameters.IndexOf(',')); //skip the Form Parameter 
+            }
         }
 
         /// <summary>
@@ -107,6 +113,8 @@ namespace Customization.Tasks
                 scannedSample.ScannedBy = (PersonnelBase)Library.Environment.CurrentUser;
                 scannedSample.TaskName = _taskName;
                 scannedSample.TaskParameters = _taskParameters;
+                //Add Default Group Id to manipulate the scanned data visible to user.
+                scannedSample.GroupId = scannedSample.ScannedBy.DefaultGroup;
 
                 EntityManager.Transaction.Add(scannedSample);
 
