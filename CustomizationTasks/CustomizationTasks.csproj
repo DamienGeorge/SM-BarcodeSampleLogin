@@ -21,6 +21,14 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DevExpress.Docs.v22.1">
+      <HintPath>..\..\..\Exe\DevExpress.Docs.v22.1.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Spreadsheet.v22.1.Core">
+      <HintPath>..\..\..\Exe\DevExpress.Spreadsheet.v22.1.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\..\Exe\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
