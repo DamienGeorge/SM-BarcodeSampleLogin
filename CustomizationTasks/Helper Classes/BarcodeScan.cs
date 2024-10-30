@@ -5,11 +5,12 @@ using Thermo.SampleManager.Library.ClientControls;
 using Thermo.SampleManager.Library.DesignerRuntime;
 using System.Timers;
 using Environment = System.Environment;
+using System.Drawing;
 
 namespace Customization.Tasks
 {
 
-    public class BarcodeLogin
+    public class BarcodeScan
     {
         public IEntityManager EntityManager { get; }
         public StandardLibrary StandardLibrary { get; }
@@ -22,7 +23,7 @@ namespace Customization.Tasks
         private TextChangedEventArgs m_TextChangedEventData;
         private string m_Title;
 
-        public BarcodeLogin(IEntityManager entityManager, StandardLibrary standardLibrary, TextEdit scanBox)
+        public BarcodeScan(IEntityManager entityManager, StandardLibrary standardLibrary, TextEdit scanBox)
         {
             EntityManager = entityManager;
             StandardLibrary = standardLibrary;
@@ -158,6 +159,28 @@ namespace Customization.Tasks
         private void AddRow(string scanText)
         {
             //Do nothing for now
+        }
+
+        /// <summary>
+        /// Method to set label caption and color for succesful scan
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="scanText"></param>
+        public void ScanSuccess(Label label, string scanText)
+        {
+            label.Caption = "Successfully Scanned : " + scanText;
+            label.BackColor = Color.SeaGreen;
+        }
+
+        /// <summary>
+        /// Method to set label caption and color for unsuccesful scan
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="scanText"></param>
+        public void ScanFailure(Label label, string scanText, string errorMessage = "")
+        {
+            label.Caption = "Cannot scan :" + scanText + "." + errorMessage;
+            label.BackColor = Color.Red;
         }
         #endregion
 

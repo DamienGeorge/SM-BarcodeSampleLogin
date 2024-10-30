@@ -13,12 +13,12 @@ namespace Customization.Tasks
     /// Task for creating entities scanned using Scanner into Table Scanned Entities
     /// TODO - Needs a better task name
     /// </summary>
-    [SampleManagerTask("NewBarcodeLoginTask")]
-    public class NewBarcodeLoginTask : DefaultFormTask
+    [SampleManagerTask("BarcodeScanTask")]
+    public class BarcodeScanTask : DefaultFormTask
     {
         #region Global Variables
         private FormBarcodeLogin m_Form;
-        private BarcodeLogin barcode;
+        private BarcodeScan barcode;
         string _taskName = String.Empty;
         string _taskParameters = String.Empty;
         #endregion
@@ -34,7 +34,7 @@ namespace Customization.Tasks
         {
             base.MainFormLoaded();
 
-            barcode = new BarcodeLogin(EntityManager, Library, m_Form.ScanBox);
+            barcode = new BarcodeScan(EntityManager, Library, m_Form.ScanBox);
 
             m_Form.ScanBox.EditValueChanged += ScanBox_EditValueChanged;
 
@@ -103,6 +103,8 @@ namespace Customization.Tasks
         {
             foreach (var scannedValue in scannedValues)
             {
+                //Set scanned text for feedback
+                barcode.ScanSuccess(m_Form.StatusText, scannedValue);
 
                 var scannedSample = EntityManager.CreateEntity<ScannedEntityBase>();
 

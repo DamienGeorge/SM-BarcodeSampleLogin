@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Drawing.Design;
 using Thermo.SampleManager.Common.CommandLine;
 using Thermo.SampleManager.Common.Data;
 using Thermo.SampleManager.Library;
 using Thermo.SampleManager.Library.EntityDefinition;
+using Thermo.SampleManager.ObjectModel;
 using Thermo.SampleManager.Server;
 
 namespace Customization.Tasks
@@ -13,6 +15,7 @@ namespace Customization.Tasks
     [SampleManagerTask(nameof(ScannedItemProcessorTask))]
     public class ScannedItemProcessorTask : SampleManagerTask, IBackgroundTask
     {
+        private Personnel currentOperator;
 
         #region Overrides
 
@@ -23,6 +26,7 @@ namespace Customization.Tasks
         {
             base.SetupTask();
 
+            currentOperator = (Personnel)Library.Environment.CurrentUser;
             Launch();
         }
         #endregion
@@ -78,11 +82,18 @@ namespace Customization.Tasks
         /// <exception cref="NotImplementedException"></exception>
         private IEntityCollection GetEntitiesToProcess()
         {
-            IQuery scannedSampleQuery = EntityManager.CreateQuery<ScannedEntityBase>();
-            scannedSampleQuery.AddEquals(ScannedEntityPropertyNames.Status, PhraseUPenStat.PhraseIdSC);
-            scannedSampleQuery.AddOrder(ScannedEntityPropertyNames.ScannedOn, ascending: true);
+            IQuery scannedEntityQuery = EntityManager.CreateQuery<ScannedEntityBase>();
+            scannedEntityQuery.AddEquals(ScannedEntityPropertyNames.Status, PhraseUPenStat.PhraseIdSC);
 
-            return EntityManager.Select(scannedSampleQuery);
+            //If processing on demand, only process the scanned entries for that user
+            if (currentOperator != null)
+            {
+                scannedEntityQuery.AddEquals(ScannedEntityPropertyNames.ScannedBy, currentOperator);
+            }
+
+            scannedEntityQuery.AddOrder(ScannedEntityPropertyNames.ScannedOn, ascending: true);
+
+            return EntityManager.Select(scannedEntityQuery);
         }
 
         #endregion
