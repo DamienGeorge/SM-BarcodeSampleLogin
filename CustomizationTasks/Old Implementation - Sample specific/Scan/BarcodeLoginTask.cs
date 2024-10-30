@@ -18,7 +18,7 @@ namespace Customization.Tasks
     public class BarcodeLoginTask : DefaultFormTask
     {
         private FormBarcodeLogin m_Form;
-        private BarcodeLogin barcode;
+        private BarcodeScan barcode;
         private EntityTemplateInternal entityTemplate;
         private Workflow entityWorkflow;
         private string scannedToField;
@@ -40,7 +40,7 @@ namespace Customization.Tasks
         {
             base.MainFormLoaded();
 
-            barcode = new BarcodeLogin(EntityManager, Library, m_Form.ScanBox);
+            barcode = new BarcodeScan(EntityManager, Library, m_Form.ScanBox);
 
             m_Form.ScanBox.EditValueChanged += ScanBox_EditValueChanged;
 

@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Thermo.SampleManager.Common.Data;
 using Thermo.SampleManager.Common.Workflow;
 using Thermo.SampleManager.Library;
 using Thermo.SampleManager.Library.DesignerRuntime;
 using Thermo.SampleManager.ObjectModel;
+using Thermo.SampleManager.Server;
 using Thermo.SampleManager.Server.Workflow;
+using Thermo.SampleManager.Server.Workflow.Services;
 
 namespace Customization.Tasks
 {
@@ -15,6 +18,7 @@ namespace Customization.Tasks
     {
         #region Global Variables
         public StandardLibrary Library { get; }
+        private const string PostLogin = "POST_LOGIN";
         #endregion
 
         #region Constructor
@@ -98,7 +102,42 @@ namespace Customization.Tasks
             return true;
         }
 
+        /// <summary>
+        /// Defers the workflow trigger for post login
+        /// </summary>
+        /// <param name="entitiesToDeferProcessing"></param>
+        internal void SetProcessDeferred(IList<IEntity> entitiesToDeferProcessing)
+        {
+            var workflowService = Library.GetService<IWorkflowEventService>();
 
-        #endregion
+            foreach (var entity in entitiesToDeferProcessing)
+            {
+                workflowService.RegisterDeferredTrigger(entity);
+            }
+        }
+
+        /// <summary>
+        /// Processes Deferred Triggers
+        /// </summary>
+        internal void ProcessDeferredTriggers(IEntityManager entityManager)
+        {
+            var workflowService = Library.GetService<IWorkflowEventService>();
+
+            while (workflowService.ProcessDeferredTriggers(PostLogin, out var postLoginBag))
+            {
+                foreach (var entry in postLoginBag.Entities)
+                {
+                    foreach (var entity in entry.Value)
+                    {
+                        entityManager.Transaction.Add(entity);
+                    }
+                }
+
+                entityManager.Commit();
+            }
+        }
     }
+
+    #endregion
 }
+

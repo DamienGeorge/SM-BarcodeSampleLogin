@@ -10,6 +10,9 @@ using Thermo.SampleManager.Library.FormDefinition;
 using Thermo.SampleManager.Server;
 using Thermo.SampleManager.Tasks;
 using DevExpress.Spreadsheet;
+using Thermo.SampleManager.Common.Extensions;
+using System.Xml;
+using System.Security.AccessControl;
 
 namespace Customization.Tasks.Testing
 {
@@ -23,28 +26,41 @@ namespace Customization.Tasks.Testing
 
             _Form = (FormSpreadSheetForm)MainForm;
 
-            var fileName = GetXMLFile();
-            OpenFileasSpreadSheet(fileName);
+            var bytes = GetXMLFile();
+            OpenFileasSpreadSheet(bytes);
 
             _Form.Saved += _Form_Saved; ;
         }
 
         private void _Form_Saved(object sender, SavedEventArgs e)
         {
-            Workbook workbook = new Workbook();
-            var result = workbook.LoadDocument(_Form.SpreadSheetArea.SpreadsheetDocument);
+            //Workbook workbook = new Workbook();
+            //var result = workbook.LoadDocument(_Form.SpreadSheetArea.SpreadsheetDocument);
+
+            var text = _Form.SpreadSheetArea.PlainText;
+            File.WriteAllText("C:\\Users\\Dan.G\\OneDrive - Zifo RnD Solutions\\Documents\\Rohan\\test.xml", text);
         }
 
-        private void OpenFileasSpreadSheet(string fileName)
+        private void OpenFileasSpreadSheet(byte[] bytes)
         {
-            var bytes = File.ReadAllBytes(fileName);
-
-            _Form.SpreadSheetArea.SpreadsheetDocument = bytes;
+            _Form.SpreadSheetArea.ImportCompatibleDocument(bytes);
         }
 
-        private string GetXMLFile()
+        private byte[] GetXMLFile()
         {
-            return Library.Utils.PromptForFile("Choose XMl file", ".xml");
+            string fileName = "";
+            var clientFile = Library.Utils.PromptForFile(string.Empty, "*|*.*");
+
+            if (clientFile.Is_Not_NullWhitespaceOrEmpty())
+            {
+                fileName = Path.GetFileName(clientFile);
+                var tempFile = Library.File.TransferToServerTemp(clientFile);
+                var bytes = File.ReadAllBytes(tempFile.FullName);
+                tempFile.Delete();
+                return bytes;
+            }
+
+            return default(byte[]);
         }
     }
 }

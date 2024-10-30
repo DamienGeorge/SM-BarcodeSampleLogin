@@ -84,8 +84,10 @@ namespace Customization.Tasks
                 WorkflowHelper workflowHelper = new WorkflowHelper(Library);
 
                 IList<IEntity> createdSamples = workflowHelper.RunWorkflow(workflow, 1);
-
                 EntityManager.Transaction.Clear();
+
+                workflowHelper.SetProcessDeferred(createdSamples);
+
 
                 foreach (SampleBase sample in createdSamples)
                 {
@@ -103,6 +105,8 @@ namespace Customization.Tasks
                     EntityManager.Transaction.Add(sample);
                 }
                 EntityManager.Commit();
+
+                workflowHelper.ProcessDeferredTriggers(EntityManager);
             }
             catch (Exception ex)
             {
@@ -111,21 +115,6 @@ namespace Customization.Tasks
 
                 throw ex;
             }
-        }
-
-        /// <summary>
-        /// Get all samples that haven't been logged in yet
-        /// </summary>
-        /// <exception cref="NotImplementedException"></exception>
-        private IEntityCollection GetSamplesToProcess()
-        {
-            IQuery scannedSampleQuery = EntityManager.CreateQuery<ScannedSampleBase>();
-            scannedSampleQuery.AddEquals(ScannedSamplePropertyNames.Status, PhraseUPenStat.PhraseIdSC);
-            scannedSampleQuery.AddOrder(ScannedSamplePropertyNames.WorkflowGuid, ascending: true);
-            scannedSampleQuery.AddOrder(ScannedSamplePropertyNames.EntityTemplate, ascending: true);
-            scannedSampleQuery.AddOrder(ScannedSamplePropertyNames.CreatedOn, ascending: true);
-
-            return EntityManager.Select(scannedSampleQuery);
         }
 
         /// <summary>
