@@ -13,37 +13,46 @@ using DevExpress.Spreadsheet;
 using Thermo.SampleManager.Common.Extensions;
 using System.Xml;
 using System.Security.AccessControl;
+using DevExpress.Spreadsheet;
 
 namespace Customization.Tasks.Testing
 {
     [SampleManagerTask(nameof(SpreadSheetToXMLTask))]
     public class SpreadSheetToXMLTask : DefaultFormTask
     {
-        FormSpreadSheetForm _Form;
-        protected override void SetupTask()
+        FormSpreadSheetForm m_Form;
+        protected override void MainFormCreated()
         {
-            base.SetupTask();
+            base.MainFormCreated();
 
-            _Form = (FormSpreadSheetForm)MainForm;
+            m_Form = (FormSpreadSheetForm)MainForm;
 
             var bytes = GetXMLFile();
             OpenFileasSpreadSheet(bytes);
 
-            _Form.Saved += _Form_Saved; ;
+            //m_Form.Saved += _Form_Saved;
+            m_Form.SaveButton.Click += SaveButton_OnClick;
         }
 
-        private void _Form_Saved(object sender, SavedEventArgs e)
+        private void SaveButton_OnClick(object sender, EventArgs e)
         {
-            //Workbook workbook = new Workbook();
-            //var result = workbook.LoadDocument(_Form.SpreadSheetArea.SpreadsheetDocument);
+            var excelContent = m_Form.SpreadSheetArea.SpreadsheetDocument;
 
-            var text = _Form.SpreadSheetArea.PlainText;
-            File.WriteAllText("C:\\Users\\Dan.G\\OneDrive - Zifo RnD Solutions\\Documents\\Rohan\\test.xml", text);
+            Workbook workbook = new Workbook();
+            workbook.LoadDocument(excelContent);
+
+            var excelAsXml = workbook.SaveDocument(DocumentFormat.XmlSpreadsheet2003);
+            File.WriteAllBytes("C:\\Users\\Dan.G\\OneDrive - Zifo RnD Solutions\\Documents\\Rohan\\test.xml", excelAsXml);
+        }
+
+        protected override void MainFormLoaded()
+        {
+
         }
 
         private void OpenFileasSpreadSheet(byte[] bytes)
         {
-            _Form.SpreadSheetArea.ImportCompatibleDocument(bytes);
+            m_Form.SpreadSheetArea.ImportCompatibleDocument(bytes);
         }
 
         private byte[] GetXMLFile()
