@@ -47,8 +47,6 @@ namespace Customization.Tasks
         {
             IEntityCollection scannedEntities = GetEntitiesToProcess();
 
-            WorkflowHelper workflowHelper = new WorkflowHelper(Library);
-
             foreach (ScannedEntityBase scannedItem in scannedEntities)
             {
                 try

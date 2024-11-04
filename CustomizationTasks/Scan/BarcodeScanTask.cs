@@ -38,7 +38,16 @@ namespace Customization.Tasks
 
             m_Form.ScanBox.EditValueChanged += ScanBox_EditValueChanged;
 
-            ReadParameters();
+            try
+            {
+                ReadParameters();
+            }
+            catch (Exception ex)
+            {
+                Library.Utils.FlashMessage(ex.Message, "Error");
+                Logger.Error(ex.Message);
+                m_Form.ForceExit();
+            }
         }
         #endregion
 
