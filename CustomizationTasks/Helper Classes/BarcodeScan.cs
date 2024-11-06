@@ -9,7 +9,9 @@ using System.Drawing;
 
 namespace Customization.Tasks
 {
-
+    /// <summary>
+    /// Utility class containing Helper methods for Barcode Processing
+    /// </summary>
     public class BarcodeScan
     {
         public IEntityManager EntityManager { get; }

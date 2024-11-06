@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing.Design;
 using Thermo.SampleManager.Common.CommandLine;
 using Thermo.SampleManager.Common.Data;
 using Thermo.SampleManager.Library;
@@ -58,6 +57,9 @@ namespace Customization.Tasks
 
                     //Transactions cannot span across tasks
                     var result = (IEntity)Library.Task.CreateTaskAndWait(scannedItem.TaskName, scannedItem.TaskParameters, entityCollection);
+                    //For >21.2
+                    //var result = (IEntity)Library.Task.CreateTaskAndWait(scannedItem.TaskName, scannedItem.TaskParameters, string.Empty, ScannedEntityBase.StructureTableName, entityCollection);
+
 
                     //EntityManager.Transaction.Add(result);
                     scannedItem.SetStatus(PhraseUPenStat.PhraseIdS);

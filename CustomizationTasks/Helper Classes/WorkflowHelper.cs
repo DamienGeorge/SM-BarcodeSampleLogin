@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Thermo.SampleManager.Common.Data;
 using Thermo.SampleManager.Common.Workflow;
 using Thermo.SampleManager.Library;
 using Thermo.SampleManager.Library.DesignerRuntime;
 using Thermo.SampleManager.ObjectModel;
-using Thermo.SampleManager.Server;
 using Thermo.SampleManager.Server.Workflow;
-using Thermo.SampleManager.Server.Workflow.Services;
 
 namespace Customization.Tasks
 {
@@ -114,6 +111,17 @@ namespace Customization.Tasks
             {
                 workflowService.RegisterDeferredTrigger(entity);
             }
+        }
+
+        /// <summary>
+        /// Overload to defer workflow trigger per entity
+        /// </summary>
+        /// <param name="entityToDeferProcessing"></param>
+        internal void SetProcessDeferred(IEntity entityToDeferProcessing)
+        {
+            var workflowService = Library.GetService<IWorkflowEventService>();
+
+            workflowService.RegisterDeferredTrigger(entityToDeferProcessing);
         }
 
         /// <summary>

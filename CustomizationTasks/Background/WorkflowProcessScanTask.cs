@@ -11,6 +11,9 @@ namespace Customization.Tasks
     [SampleManagerTask(nameof(WorkflowProcessScanTask))]
     public class WorkflowProcessScanTask : SampleManagerTask
     {
+        /// <summary>
+        /// Entry Point
+        /// </summary>
         protected override void SetupTask()
         {
             base.SetupTask();
@@ -56,6 +59,11 @@ namespace Customization.Tasks
 
         }
 
+        /// <summary>
+        /// Set Parameters to use from workflow
+        /// </summary>
+        /// <param name="propertyBag"></param>
+        /// <param name="scannedEntity"></param>
         private void AddParametersToWorkflowPropertyBag(IWorkflowPropertyBag propertyBag, ScannedEntityBase scannedEntity)
         {
             for (int i = 0; i < Context.TaskParameters.Length; i++)
@@ -70,6 +78,9 @@ namespace Customization.Tasks
 
             //TODO - Allow scanned entity to be separated by record separator
             propertyBag.Set("$Barcode", scannedEntity.ScannedText);
+            propertyBag.Set("$ScannedBy", scannedEntity.ScannedBy);
+            propertyBag.Set("$ScannedOn", scannedEntity.ScannedOn.Value.ToString("s"));
         }
     }
 }
+

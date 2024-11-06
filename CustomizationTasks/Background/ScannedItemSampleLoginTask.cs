@@ -86,9 +86,6 @@ namespace Customization.Tasks
                 IList<IEntity> createdSamples = workflowHelper.RunWorkflow(workflow, 1);
                 EntityManager.Transaction.Clear();
 
-                workflowHelper.SetProcessDeferred(createdSamples);
-
-
                 foreach (SampleBase sample in createdSamples)
                 {
                     ISchemaField schemaField = sample.FindSchemaField(scannedFieldName);
@@ -113,7 +110,7 @@ namespace Customization.Tasks
                 Logger.Error(ex.Message);
                 Logger.Error(ex.InnerException);
 
-                throw ex;
+                throw;
             }
         }
 
