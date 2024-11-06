@@ -3,7 +3,6 @@ using Thermo.SampleManager.Common.CommandLine;
 using Thermo.SampleManager.Common.Data;
 using Thermo.SampleManager.Library;
 using Thermo.SampleManager.Library.EntityDefinition;
-using Thermo.SampleManager.ObjectModel;
 using Thermo.SampleManager.Server;
 
 namespace Customization.Tasks
@@ -14,7 +13,8 @@ namespace Customization.Tasks
     [SampleManagerTask(nameof(ScannedItemProcessorTask))]
     public class ScannedItemProcessorTask : SampleManagerTask, IBackgroundTask
     {
-        private Personnel currentOperator;
+        [CommandLineSwitch("operatorName", "Choose Operator to selectively run the task for", false)]
+        public string CurrentOperator { get; set; }
 
         #region Overrides
 
@@ -25,8 +25,12 @@ namespace Customization.Tasks
         {
             base.SetupTask();
 
-            currentOperator = (Personnel)Library.Environment.CurrentUser;
-            Launch();
+            if (Library.Environment.IsBackground() == false)
+            {
+                CurrentOperator = Library.Environment.CurrentUser.Name;
+                Launch();
+            }
+
         }
         #endregion
 
@@ -36,7 +40,12 @@ namespace Customization.Tasks
         /// </summary>
         public void Launch()
         {
+            Logger.Error($"{DateTime.Now} : Running Scanned Processor Task...");
+            var startTime = DateTime.Now;
             ProcessNewEntries();
+
+            var timeTaken = DateTime.Now - startTime;
+            Logger.Error($"{DateTime.Now} : Completed Running Scanned Processor Task in {timeTaken.TotalSeconds} s");
         }
 
         /// <summary>
@@ -46,8 +55,10 @@ namespace Customization.Tasks
         {
             IEntityCollection scannedEntities = GetEntitiesToProcess();
 
+            Logger.Error($"Found {scannedEntities.Count} entities to process");
             foreach (ScannedEntityBase scannedItem in scannedEntities)
             {
+                Logger.Error($"{DateTime.Now} : Processing {scannedItem.Name}...");
                 try
                 {
                     IEntityCollection entityCollection = new EntityCollection(TableNames.ScannedEntity)
@@ -56,16 +67,15 @@ namespace Customization.Tasks
                     };
 
                     //Transactions cannot span across tasks
-                    var result = (IEntity)Library.Task.CreateTaskAndWait(scannedItem.TaskName, scannedItem.TaskParameters, entityCollection);
-                    //For >21.2
-                    //var result = (IEntity)Library.Task.CreateTaskAndWait(scannedItem.TaskName, scannedItem.TaskParameters, string.Empty, ScannedEntityBase.StructureTableName, entityCollection);
-
+                    var result = (IEntity)Library.Task.CreateTaskAndWait(scannedItem.TaskName, scannedItem.TaskParameters, string.Empty, ScannedEntityBase.StructureTableName, entityCollection);
 
                     //EntityManager.Transaction.Add(result);
                     scannedItem.SetStatus(PhraseUPenStat.PhraseIdS);
+                    Logger.Error($"{DateTime.Now} : Completed Processing {scannedItem.Name} Successfully.");
                 }
                 catch (Exception ex)
                 {
+                    Logger.Error(ex.Message);
                     scannedItem.ErrorContent = ex.Message;
                     scannedItem.SetStatus(PhraseUPenStat.PhraseIdE);
                 }
@@ -82,13 +92,16 @@ namespace Customization.Tasks
         /// <exception cref="NotImplementedException"></exception>
         private IEntityCollection GetEntitiesToProcess()
         {
+            Logger.Error("Getting Entitites To Process...");
+
             IQuery scannedEntityQuery = EntityManager.CreateQuery<ScannedEntityBase>();
             scannedEntityQuery.AddEquals(ScannedEntityPropertyNames.Status, PhraseUPenStat.PhraseIdSC);
 
             //If processing on demand, only process the scanned entries for that user
-            if (currentOperator != null)
+            if (CurrentOperator != null)
             {
-                scannedEntityQuery.AddEquals(ScannedEntityPropertyNames.ScannedBy, currentOperator);
+                Logger.Error($"Using Operator : {CurrentOperator}");
+                scannedEntityQuery.AddEquals(ScannedEntityPropertyNames.ScannedBy, CurrentOperator);
             }
 
             scannedEntityQuery.AddOrder(ScannedEntityPropertyNames.ScannedOn, ascending: true);
