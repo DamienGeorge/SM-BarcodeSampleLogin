@@ -68,22 +68,23 @@ namespace Customization.Tasks
 
             var parameters = menuparams.Split(',');
 
-
-
             if (parameters.Length > 1)
             {
                 _taskParameters = menuparams.Substring(menuparams.IndexOf(',') + 1);
                 _taskName = parameters[0];
-            }
-            else
-            {
-                throw new ArgumentException("Expected at least 1 parameter");
             }
 
             if (Context.TaskParameters != null && Context.TaskParameters.Length > 1)
             {
                 var contextTaskParameters = String.Join(',', Context.TaskParameters);
                 _taskParameters += contextTaskParameters.Substring(contextTaskParameters.IndexOf(',')); //skip the Form Parameter 
+            }
+
+            if (_taskParameters.Length == 0)
+            {
+                {
+                    throw new ArgumentException("Expected at least 1 parameter");
+                }
             }
         }
 
