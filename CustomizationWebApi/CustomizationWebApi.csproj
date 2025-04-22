@@ -1,0 +1,105 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+		<OutputPath>..\..\..\Exe\SolutionAssemblies\</OutputPath>
+		<AssemblySearchPaths>..\..\..\Exe\;..\..\..\Exe\SolutionAssemblies;$(AssemblySearchPaths)</AssemblySearchPaths>
+		<DocumentationFile>$(OutputPath)Thermo.SampleManager.WebApiTasks.xml</DocumentationFile>
+		<StartAction>Program</StartAction>
+		<StartProgram>$(SampleManager)SampleManager.exe</StartProgram>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CoreWCF.WebHttp" Version="1.3.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="System.ServiceModel.Duplex" Version="6.0.*" />
+		<PackageReference Include="System.ServiceModel.Federation" Version="6.0.*" />
+		<PackageReference Include="System.ServiceModel.NetTcp" Version="6.0.*" />
+		<PackageReference Include="System.ServiceModel.Security" Version="6.0.*" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="System.ServiceModel">
+			<HintPath>..\..\..\Exe\System.ServiceModel.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Thermo.ChromeleonLink.Data.Objects">
+			<HintPath>..\..\..\Exe\Thermo.ChromeleonLink.Data.Objects.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Thermo.Framework.Common">
+			<HintPath>..\..\..\Exe\Thermo.Framework.Common.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Thermo.Framework.Core">
+			<HintPath>..\..\..\Exe\Thermo.Framework.Core.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Thermo.Framework.Server">
+			<HintPath>..\..\..\Exe\Thermo.Framework.Server.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Thermo.Framework.Utilities">
+			<HintPath>..\..\..\Exe\Thermo.Framework.Utilities.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Thermo.SampleManager.Common">
+			<HintPath>..\..\..\Exe\Thermo.SampleManager.Common.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Thermo.SampleManager.Core">
+			<HintPath>..\..\..\Exe\Thermo.SampleManager.Core.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Thermo.SampleManager.Internal.ObjectModel">
+			<HintPath>..\..\..\Exe\Thermo.SampleManager.Internal.ObjectModel.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Thermo.SampleManager.Library">
+			<HintPath>..\..\..\Exe\Thermo.SampleManager.Library.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Thermo.SampleManager.ObjectModel">
+			<HintPath>..\..\..\Exe\SolutionAssemblies\Thermo.SampleManager.ObjectModel.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Thermo.SampleManager.Server.Mvc">
+			<HintPath>..\..\..\Exe\Thermo.SampleManager.Server.Mvc.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Thermo.SampleManager.Server.ObjectSupport">
+			<HintPath>..\..\..\Exe\Thermo.SampleManager.Server.ObjectSupport.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Thermo.SampleManager.Server.Services">
+			<HintPath>..\..\..\Exe\Thermo.SampleManager.Server.Services.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Thermo.SampleManager.Server.Workflow">
+			<HintPath>..\..\..\Exe\Thermo.SampleManager.Server.Workflow.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Thermo.SampleManager.Tasks">
+			<HintPath>..\..\..\Exe\SolutionAssemblies\Thermo.SampleManager.Tasks.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Thermo.SampleManager.Tasks.EntityDefinition">
+			<HintPath>..\..\..\Exe\SolutionAssemblies\Thermo.SampleManager.Tasks.EntityDefinition.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Thermo.SM.LIMSML.Helper">
+			<HintPath>..\..\..\Exe\Thermo.SM.LIMSML.Helper.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="FTI\Subscription\Request\" />
+	</ItemGroup>
+
+</Project>

@@ -54,10 +54,10 @@ namespace Customization.Tasks
         private void ProcessNewEntries()
         {
             IEntityCollection scannedEntities = GetEntitiesToProcess();
-
             Logger.Error($"Found {scannedEntities.Count} entities to process");
             foreach (ScannedEntityBase scannedItem in scannedEntities)
             {
+                //TODO - Lock each entry and commit as soon as it's processed.
                 Logger.Error($"{DateTime.Now} : Processing {scannedItem.Name}...");
                 try
                 {
@@ -82,7 +82,7 @@ namespace Customization.Tasks
 
                 EntityManager.Transaction.Add(scannedItem);
             }
-
+            //baseline with this
             EntityManager.Commit();
         }
 
