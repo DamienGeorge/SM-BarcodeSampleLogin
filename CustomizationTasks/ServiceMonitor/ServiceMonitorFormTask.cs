@@ -13,6 +13,10 @@ using System.Text.RegularExpressions;
 using Thermo.SampleManager.Common.Data;
 using System.Linq;
 using Thermo.Framework.Core;
+using Thermo.SampleManager.Server.Workflow;
+using System.Text;
+using Thermo.SampleManager.ObjectModel;
+using Thermo.SampleManager.Common.Workflow;
 
 namespace Customization.Tasks
 {
@@ -45,8 +49,9 @@ namespace Customization.Tasks
         private TimeSpan wdtInterval;
 
         private TimeSpan wcfInterval;
-        private List<WCFDetail> wcfDetails;
+        private List<WCFDetail> currentWcfDetails;
         private bool IsTimerqueueRunning;
+        private Workflow mailWorkflow;
 
         public string[] WCFurls { get; private set; }
         public bool isWCFRunning { get; private set; }
@@ -106,7 +111,8 @@ namespace Customization.Tasks
             timer.Elapsed += Timer_Elapsed;
             timer.Start();
 
-            UpdateGrids();
+            UpdateForm();
+            CheckRunErrorWorkflow();
         }
 
         /// <summary>
@@ -120,26 +126,34 @@ namespace Customization.Tasks
             wcfConfig = m_VglGlobalService.GetGlobalString("MONITOR_WCF_URL");
             wdtInterval = m_VglGlobalService.GetGlobalInterval("MONITOR_WDT_FAIL_INTERVAL");
             wcfInterval = m_VglGlobalService.GetGlobalInterval("MONITOR_WCF_FAIL_INTERVAL");
-            //Todo - clear out the colors, they don't work
-            //failColor = ConvertFromHexToRGB(m_VglGlobalService.GetGlobalString("MONITOR_FAIL_COLOUR"));
-            //passColor = ConvertFromHexToRGB(m_VglGlobalService.GetGlobalString("MONITOR_PASS_COLOUR"));
             queueLength = m_VglGlobalService.GetGlobalInt("MONITOR_WDT_FAIL_QUEUE_LENGTH");
+
             mailReportConfig = Library.Environment.GetGlobalString("MONITOR_WORKFLOW");
+            mailWorkflow = EntityManager.SelectLatestVersion<Workflow>(new Identity(mailReportConfig));
         }
 
-        private void UpdateGrids()
+        /// <summary>
+        /// Update the Form components
+        /// </summary>
+        private void UpdateForm()
         {
             FormatSweeperGrid();
             UpdateWCFGrid();
-            UpdateTimerQueueLabel();
+            UpdateTimerQueueCaption();
             SetHeader();
         }
 
+        /// <summary>
+        /// Set Caption on the Form
+        /// </summary>
         private void SetHeader()
         {
             m_Form.MainLabel.Caption = $"{HeaderCaption} {DateTime.Now}";
         }
 
+        /// <summary>
+        /// Better looking colors for the form
+        /// </summary>
         private void SetColors()
         {
             m_Form.MainLabel.BackColor = MainLabelColor;
@@ -154,27 +168,84 @@ namespace Customization.Tasks
         /// <exception cref="NotImplementedException"></exception>
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            UpdateGrids();
+            UpdateForm();
 
-            //TODO - Send mail to Support and TechOps
-            //Create Table in SampleManager to Store the Service Mail 
+            CheckRunErrorWorkflow();
+        }
 
-            var mailWorkflow = EntityManager.Select<WorkflowBase>(new Identity(mailReportConfig));
-            if (mailReportConfig != null)
+        /// <summary>
+        /// Run Error Workflow if one of the services is down
+        /// </summary>
+        private void CheckRunErrorWorkflow()
+        {
+            if (mailWorkflow != null)
             {
+                if (IsTimerqueueRunning == false || currentWcfDetails.Any(x => x.IsResponsive == false))
+                {
+                    WorkflowPropertyBag propertyBag = new WorkflowPropertyBag();
 
+                    StringBuilder mailContent = new StringBuilder();
+
+                    if (IsTimerqueueRunning)
+                    {
+                        mailContent.AppendLine("Timerqueue service is running normally");
+                    }
+                    else
+                    {
+                        mailContent.AppendLine($"Timerqueue is not running as expected. Please check the logs and restart if necessary.");
+                    }
+
+                    foreach (var entry in currentWcfDetails.Where(x => x.IsResponsive == false))
+                    {
+                        mailContent.AppendLine($"WCF service {entry.url} is not responding. Please check the logs and restart if necessary.");
+                    }
+
+                    propertyBag.Add("$mailSubject", "Errors Occured in one or more of the Services");
+                    propertyBag.Add("$mailMessage", mailContent.ToString());
+
+                    Library.Workflow.Perform(mailWorkflow, propertyBag);
+
+                    var errorMessage = string.Empty;
+                    if (propertyBag.HasErrors)
+                    {
+                        foreach (WorkflowError error in propertyBag.Errors)
+                        {
+                            errorMessage += error.Message;
+                        }
+                    }
+
+                    CreateMonitorLogEntry(mailContent.ToString(), errorMessage);
+                }
             }
         }
 
+        /// <summary>
+        /// Create a Log entry for each time the workflow is triggered
+        /// </summary>
+        /// <param name="mailContent"></param>
+        /// <param name="errorMessage"></param>
+        private void CreateMonitorLogEntry(string mailContent, string errorMessage)
+        {
+            var logEntry = EntityManager.CreateEntity(TableNames.UServiceMonitorLog) as UServiceMonitorLogBase;
+            logEntry.MailContent = mailContent;
+            logEntry.DeliveryErrors = errorMessage;
+            logEntry.SentOn = DateTime.Now;
 
+            EntityManager.Transaction.Add(logEntry);
+            EntityManager.Commit();
+        }
+
+        /// <summary>
+        /// Update the WCF Unbound Grid
+        /// </summary>
         private void UpdateWCFGrid()
         {
-            wcfDetails = CheckWCF();
+            currentWcfDetails = CheckWCF();
 
             m_Form.WCFUnboundGrid.BeginUpdate();
             m_Form.WCFUnboundGrid.ClearRows();
 
-            foreach (var wcf in wcfDetails)
+            foreach (var wcf in currentWcfDetails)
             {
                 var row = m_Form.WCFUnboundGrid.AddRow(wcf.url, wcf.LastCheckIn, wcf.IsResponsive);
 
@@ -186,6 +257,10 @@ namespace Customization.Tasks
             m_Form.WCFUnboundGrid.EndUpdate();
         }
 
+        /// <summary>
+        /// Check all the WCFs defined in the configuration
+        /// </summary>
+        /// <returns></returns>
         private List<WCFDetail> CheckWCF()
         {
             List<WCFDetail> wCFDetails = new List<WCFDetail>();
@@ -230,6 +305,9 @@ namespace Customization.Tasks
             return wCFDetails;
         }
 
+        /// <summary>
+        /// Apply formatting to the Sweeper Grid
+        /// </summary>
         private void FormatSweeperGrid()
         {
             var entries = m_Form.SweeperDataGrid.GridData;
@@ -247,45 +325,29 @@ namespace Customization.Tasks
             }
         }
 
-        private void UpdateTimerQueueLabel()
+        /// <summary>
+        /// Set the timerqueue Caption
+        /// </summary>
+        private void UpdateTimerQueueCaption()
         {
             IQuery tqMonitorQuery = EntityManager.CreateQuery(TableNames.TimerqueueMonitor);
             IEntityCollection entityCollection = EntityManager.Select(tqMonitorQuery);
 
             var query = entityCollection.ActiveItems
                 .Cast<TimerqueueMonitorBase>()
-                .Where(x => x.RunTime > DateTime.Parse("1900-01-01 00:00:00.000"))
-                .Select(x => x);
+                .Select(x => x)
+                .FirstOrDefault();
 
-            var runTime = query.FirstOrDefault().RunTime;
-            var pendingTasks = query.LastOrDefault().PendingTasks;
+            var runTime = query.RunTime;
+            var pendingTasks = query.PendingTasks;
 
-            var message = $"{pendingTasks} active tasks pending. \n Last run time at {runTime}";
+            var message = $"Timerqueue Service : \n {pendingTasks} active tasks pending. \n Last run time at {runTime}";
             m_Form.TimerqueueLabel.Caption = message;
 
             if ((DateTime.Now - runTime.Value) > wdtInterval && pendingTasks < queueLength)
             {
                 m_Form.TimerqueueLabel.ForeColor = failColor;
                 IsTimerqueueRunning = false;
-            }
-        }
-
-        private Color ConvertFromHexToRGB(string color)
-        {
-            if (color.Length >= 6)
-            {
-                if (color.StartsWith('#'))
-                {
-                    return Color.FromArgb(Convert.ToInt32(color.Substring(1), 16));
-                }
-                else
-                {
-                    return Color.FromArgb(Convert.ToInt32(color, 16));
-                }
-            }
-            else
-            {
-                return Color.White;
             }
         }
     }
