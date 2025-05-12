@@ -197,7 +197,7 @@ namespace Customization.Tasks
 
                     foreach (var entry in currentWcfDetails.Where(x => x.IsResponsive == false))
                     {
-                        mailContent.AppendLine($"WCF service {entry.url} is not responding. Please check the logs and restart if necessary.");
+                        mailContent.Append($"WCF service {entry.url} is not responding. Please check the logs and restart if necessary.");
                     }
 
                     propertyBag.Add("$mailSubject", "Errors Occured in one or more of the Services");
@@ -348,6 +348,10 @@ namespace Customization.Tasks
             {
                 m_Form.TimerqueueLabel.ForeColor = failColor;
                 IsTimerqueueRunning = false;
+            }
+            else
+            {
+                IsTimerqueueRunning = true;
             }
         }
     }
