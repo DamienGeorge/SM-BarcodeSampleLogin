@@ -144,13 +144,15 @@ namespace Customization.Tasks
 
             if (node.Data is Sample sample)
             {
-                var tests = sample.Tests?.ActiveItems.Cast<Test>().Where(x => x.Assign).Select(x => new { x.Analysis.Name, x.ComponentListEntity?.FtiNorm.NormId });
+                //var tests = sample.Tests?.ActiveItems.Cast<Test>().Where(x => x.Assign).Select(x => new { x.Analysis.Name, x.ComponentListEntity?.FtiNorm.NormId });
+                var tests = sample.Tests?.ActiveItems.Cast<Test>().Where(x => x.Assign).Select(x => new { x.Analysis.Name, x.ComponentListEntity?.CompList });
 
                 if (tests.Count() > 0)
                 {
                     foreach (var test in tests)
                     {
-                        text += $"{test.Name} {test.NormId}";
+                        //text += $"{test.Name} {test.NormId}";
+                        text += $"{test.Name} {test.CompList}";
                     }
                 }
             }
