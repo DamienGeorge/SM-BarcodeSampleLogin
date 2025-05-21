@@ -1,11 +1,4 @@
-﻿using System;
-using System.Linq;
-using Thermo.Framework.Core;
-using Thermo.SampleManager.Common.Data;
-using Thermo.SampleManager.Library;
-using Thermo.SampleManager.Library.ClientControls;
-using Thermo.SampleManager.Library.FormDefinition;
-using Thermo.SampleManager.ObjectModel;
+﻿using Thermo.SampleManager.Library;
 using Thermo.SampleManager.Tasks;
 
 namespace Customization.Tasks
@@ -19,7 +12,7 @@ namespace Customization.Tasks
         {
             base.MainFormLoaded();
 
-            fTISampleAdminBaseTask = new FTISampleAdminBaseTask(m_Form, Library);
+            fTISampleAdminBaseTask = new FTISampleAdminBaseTask(m_Form, Library, Logger, EntityManager);
 
             UpdateAllNodes();
         }
