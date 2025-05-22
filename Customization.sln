@@ -6,8 +6,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomizationObjectModel", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomizationTasks", "CustomizationTasks\CustomizationTasks.csproj", "{EBE25653-E355-4486-B681-E0387EAFFBF6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomizationWebApi", "CustomizationWebApi\CustomizationWebApi.csproj", "{22D8D82E-4C89-43D1-823B-B262BF43419C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,10 +20,6 @@ Global
 		{EBE25653-E355-4486-B681-E0387EAFFBF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBE25653-E355-4486-B681-E0387EAFFBF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBE25653-E355-4486-B681-E0387EAFFBF6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{22D8D82E-4C89-43D1-823B-B262BF43419C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{22D8D82E-4C89-43D1-823B-B262BF43419C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{22D8D82E-4C89-43D1-823B-B262BF43419C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{22D8D82E-4C89-43D1-823B-B262BF43419C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
