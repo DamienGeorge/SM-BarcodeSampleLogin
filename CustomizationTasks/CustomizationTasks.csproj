@@ -127,7 +127,4 @@
   <ItemGroup>
     <ProjectReference Include="..\CustomizationObjectModel\CustomizationObjectModel.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="FTISampleAdmin\" />
-  </ItemGroup>
 </Project>
