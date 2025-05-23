@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.AccessControl;
+using Thermo.Framework.Core;
 
 namespace Customization.Tasks
 {
@@ -14,11 +15,12 @@ namespace Customization.Tasks
 
         public WCFDetail()
         {
-            
+
         }
 
         public string url { get; set; }
         public DateTime LastCheckIn { get; set; }
+        public NullableDateTime LastResponseTime { get; set; }
         public bool IsResponsive { get; set; }
     }
 }

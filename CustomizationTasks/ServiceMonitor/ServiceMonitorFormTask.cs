@@ -17,6 +17,7 @@ using Thermo.SampleManager.Server.Workflow;
 using System.Text;
 using Thermo.SampleManager.ObjectModel;
 using Thermo.SampleManager.Common.Workflow;
+using Thermo.SampleManager.Common.Extensions;
 
 namespace Customization.Tasks
 {
@@ -28,6 +29,8 @@ namespace Customization.Tasks
     [SampleManagerTask(nameof(ServiceMonitorFormTask))]
     public class ServiceMonitorFormTask : DefaultFormTask
     {
+        private const string CheckLogMessage = " Please check the logs and restart if necessary.";
+        private const string ErrorMessage = "One or more SampleManager Services require your attention";
         FormServiceMonitor m_Form;
         private IVglGlobalService m_VglGlobalService;
 
@@ -52,6 +55,7 @@ namespace Customization.Tasks
         private List<WCFDetail> currentWcfDetails;
         private bool IsTimerqueueRunning;
         private Workflow mailWorkflow;
+        private TimeSpan mailFrequency;
 
         public string[] WCFurls { get; private set; }
         public bool isWCFRunning { get; private set; }
@@ -130,6 +134,7 @@ namespace Customization.Tasks
 
             mailReportConfig = Library.Environment.GetGlobalString("MONITOR_WORKFLOW");
             mailWorkflow = EntityManager.SelectLatestVersion<Workflow>(new Identity(mailReportConfig));
+            mailFrequency = m_VglGlobalService.GetGlobalInterval("MONITOR_MAIL_FREQUENCY");
         }
 
         /// <summary>
@@ -180,43 +185,75 @@ namespace Customization.Tasks
         {
             if (mailWorkflow != null)
             {
-                if (IsTimerqueueRunning == false || currentWcfDetails.Any(x => x.IsResponsive == false))
+
+                StringBuilder mailContent = GetMailContent(out string errorPhrase);
+
+                var entry = GetLatestServiceLogEntry();
+
+                //TODO - move to workflow
+                if (entry is not null)
                 {
-                    WorkflowPropertyBag propertyBag = new WorkflowPropertyBag();
-
-                    StringBuilder mailContent = new StringBuilder();
-
-                    if (IsTimerqueueRunning)
+                    if (entry.MailContent == mailContent.ToString() && (DateTime.Now - entry.SentOn.Value) > mailFrequency)
                     {
-                        mailContent.AppendLine("Timerqueue service is running normally");
-                    }
-                    else
+                        WorkflowPropertyBag propertyBag = new WorkflowPropertyBag
                     {
-                        mailContent.AppendLine($"Timerqueue is not running as expected. Please check the logs and restart if necessary.");
-                    }
+                        { "$mailSubject", ErrorMessage},
+                        { "$mailMessage", mailContent.ToString() }
+                    };
 
-                    foreach (var entry in currentWcfDetails.Where(x => x.IsResponsive == false))
-                    {
-                        mailContent.Append($"WCF service {entry.url} is not responding. Please check the logs and restart if necessary.");
-                    }
+                        Library.Workflow.Perform(mailWorkflow, propertyBag);
 
-                    propertyBag.Add("$mailSubject", "Errors Occured in one or more of the Services");
-                    propertyBag.Add("$mailMessage", mailContent.ToString());
-
-                    Library.Workflow.Perform(mailWorkflow, propertyBag);
-
-                    var errorMessage = string.Empty;
-                    if (propertyBag.HasErrors)
-                    {
-                        foreach (WorkflowError error in propertyBag.Errors)
+                        var errorMessage = string.Empty;
+                        if (propertyBag.HasErrors)
                         {
-                            errorMessage += error.Message;
+                            foreach (WorkflowError error in propertyBag.Errors)
+                            {
+                                errorMessage += error.Message;
+                            }
                         }
+                        CreateMonitorLogEntry(mailContent.ToString(), errorMessage, errorPhrase);
                     }
-
-                    CreateMonitorLogEntry(mailContent.ToString(), errorMessage);
                 }
             }
+        }
+
+        private UServiceMonitorLogBase GetLatestServiceLogEntry()
+        {
+            IQuery query = EntityManager.CreateQuery<UServiceMonitorLogBase>();
+
+            var serviceLogRecord = EntityManager.Select(query).ActiveItems.Cast<UServiceMonitorLogBase>().OrderByDescending(x => x.SentOn).FirstOrDefault();
+
+            return serviceLogRecord;
+
+        }
+
+        private StringBuilder GetMailContent(out string errorPhrase)
+        {
+            errorPhrase = PhraseErrorType.PhraseIdNA;
+
+            StringBuilder mailContent = new StringBuilder();
+
+            if (currentWcfDetails.Any(x => x.IsResponsive == false || (DateTime.Now - x.LastResponseTime.Value) > wcfInterval))
+            {
+                foreach (var entry in currentWcfDetails.Where(x => x.IsResponsive == false || (DateTime.Now - x.LastResponseTime.Value) > wcfInterval))
+                {
+                    mailContent.Append($"WCF service {entry.url} is not responding since {entry.LastResponseTime}.");
+                }
+
+                errorPhrase = PhraseErrorType.PhraseIdWCF;
+            }
+
+            if (IsTimerqueueRunning == false)
+            {
+                mailContent.AppendLine(EntityManager.SelectPhrase(PhraseErrorType.Identity, PhraseErrorType.PhraseIdTQ)?.Description);
+                errorPhrase = errorPhrase == PhraseErrorType.PhraseIdWCF ? PhraseErrorType.PhraseIdBOTH : PhraseErrorType.PhraseIdTQ;
+            }
+
+            if (mailContent.Length > 0)
+            {
+                mailContent.Append(CheckLogMessage);
+            }
+            return mailContent;
         }
 
         /// <summary>
@@ -224,12 +261,15 @@ namespace Customization.Tasks
         /// </summary>
         /// <param name="mailContent"></param>
         /// <param name="errorMessage"></param>
-        private void CreateMonitorLogEntry(string mailContent, string errorMessage)
+        private void CreateMonitorLogEntry(string mailContent, string errorMessage, string errorPhrase)
         {
             var logEntry = EntityManager.CreateEntity(TableNames.UServiceMonitorLog) as UServiceMonitorLogBase;
             logEntry.MailContent = mailContent;
             logEntry.DeliveryErrors = errorMessage;
             logEntry.SentOn = DateTime.Now;
+            logEntry.ErrorType = EntityManager.SelectPhrase(PhraseErrorType.Identity, errorPhrase).ToString();
+            logEntry.Status = mailContent.Is_Not_NullWhitespaceOrEmpty();
+
 
             EntityManager.Transaction.Add(logEntry);
             EntityManager.Commit();
@@ -247,7 +287,7 @@ namespace Customization.Tasks
 
             foreach (var wcf in currentWcfDetails)
             {
-                var row = m_Form.WCFUnboundGrid.AddRow(wcf.url, wcf.LastCheckIn, wcf.IsResponsive);
+                var row = m_Form.WCFUnboundGrid.AddRow(wcf.url, wcf.LastCheckIn, wcf.IsResponsive, wcf.LastResponseTime);
 
                 if (wcf.IsResponsive == false)
                 {
@@ -276,6 +316,7 @@ namespace Customization.Tasks
                         using (StreamReader streamReader = new StreamReader(httpClient.Send(request).Content.ReadAsStream()))
                         {
                             string end = streamReader.ReadToEnd();
+                            var wcfDetail = new WCFDetail(wcfUrl, DateTime.Now, false);
 
                             if (string.IsNullOrEmpty(end))
                             {
@@ -284,14 +325,16 @@ namespace Customization.Tasks
 
                             if (Regex.IsMatch("Connected" + System.Environment.NewLine + end, "overallStatus.+Ok.+\n", RegexOptions.IgnoreCase))
                             {
-                                wCFDetails.Add(new WCFDetail(wcfUrl, DateTime.Now, true));
+                                wcfDetail.LastResponseTime = DateTime.Now;
+                                wcfDetail.IsResponsive = true;
                                 Logger.Error("WCF Status Good");
                             }
                             else
                             {
                                 string message = "WCF response indicated there was an issue. This indicates there is an issue with the WCF service";
-                                wCFDetails.Add(new WCFDetail(wcfUrl, DateTime.Now, false));
                             }
+
+                            wCFDetails.Add(wcfDetail);
                         }
                     }
 
