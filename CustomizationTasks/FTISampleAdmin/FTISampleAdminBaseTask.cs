@@ -22,6 +22,7 @@ namespace Customization.Tasks
         private const string StatisticalSampleGr = "Anlieferung";
         private const string StorageStatisticalSampleEn = "Storage in";
         private const string StorageStatisticalSampleGr = "Lagerung in ";
+        private const string StatisticalSampleEntityId = "FTI_AVG";
         #endregion
 
         SimpleTreeList _treeList;
@@ -34,6 +35,7 @@ namespace Customization.Tasks
         public StandardLibrary Library { get; }
         public Logger Logger { get; }
         public IEntityManager EntityManager { get; }
+        public bool isStartup = false;
 
         public FTISampleAdminBaseTask(FormSampleAdmin MainForm, StandardLibrary library, Logger logger, IEntityManager entityManager)
         {
@@ -175,28 +177,31 @@ namespace Customization.Tasks
                         var workflowId = sample.WorkflowNode.WorkflowId;
 
                         //Check if Miscellaneous Sample
-                        if (workflowId == "15B20636-1FF2-4511-B4DE-2E93FD0E33B0")
+                        if (sample.SampleType.PhraseId == PhraseSampType.PhraseIdMISC_SUMM)
                         {
                             node.DisplayText = language == "EN-GB" ? MiscActivitiesEn : MiscActivitiesGr;
                         }
 
                         //Check if Material Sample
-                        if (workflowId == "10C37E39-66F9-424F-B575-3A2060C2F395")
+                        if (sample.SampleType.PhraseId == PhraseSampType.PhraseIdMATERIAL)
                         {
                             node.DisplayText = $"{row.GetValue(SamplePropertyNames.SampleName).ToString()} ({row.GetValue(SamplePropertyNames.FtiMaterialType)})";
                         }
 
                         //Check if Statistical Sample
-                        if (workflowId == "08962026-AE43-438F-89CF-30E6F04C2D6D")
+                        if (sample.SampleType.PhraseId == PhraseSampType.PhraseIdAVERAGE)
                         {
-                            node.DisplayText = language == "EN-GB" ? StatisticalSampleEn : StatisticalSampleGr;
-                        }
-
-                        //Check if Statistical Storage Sample
-                        if (workflowId == "4E9191F5-FE7C-4B09-BE99-E2FAD91B311B")
-                        {
-                            node.DisplayText = language == "EN-GB" ? StorageStatisticalSampleEn : StorageStatisticalSampleGr;
-                            node.DisplayText = $"{node.DisplayText} {row.GetValue(SamplePropertyNames.FtiMediaType)} ({row.GetValue(SamplePropertyNames.FtiTimepoint)}{row.GetValue(SamplePropertyNames.FtiTimeUnit).ToString().Trim()} {row.GetValue(SamplePropertyNames.FtiTemperature)}{row.GetValue(SamplePropertyNames.FtiTempUnit).ToString().Trim()})";
+                            var statisticalSampleTemplate = EntityManager.SelectLatestVersion<EntityTemplate>(StatisticalSampleEntityId);
+                            if (sample.EntityTemplate == statisticalSampleTemplate)
+                            {
+                                node.DisplayText = language == "EN-GB" ? StatisticalSampleEn : StatisticalSampleGr;
+                            }
+                            //Check if Statistical Storage Sample
+                            else
+                            {
+                                node.DisplayText = language == "EN-GB" ? StorageStatisticalSampleEn : StorageStatisticalSampleGr;
+                                node.DisplayText = $"{node.DisplayText} {row.GetValue(SamplePropertyNames.FtiMediaType)} ({row.GetValue(SamplePropertyNames.FtiTimepoint)}{row.GetValue(SamplePropertyNames.FtiTimeUnit).ToString().Trim()} {row.GetValue(SamplePropertyNames.FtiTemperature)}{row.GetValue(SamplePropertyNames.FtiTempUnit).ToString().Trim()})";
+                            }
                         }
 
                         //TODO - Remove, only for testing
@@ -229,29 +234,31 @@ namespace Customization.Tasks
                     var workflowId = sample.WorkflowNode.WorkflowId;
 
                     //Check if Miscellaneous Sample
-                    if (workflowId == "15B20636-1FF2-4511-B4DE-2E93FD0E33B0")
+                    if (sample.SampleType.PhraseId == PhraseSampType.PhraseIdMISC_SUMM)
                     {
                         node.DisplayText = language == "EN-GB" ? MiscActivitiesEn : MiscActivitiesGr;
                     }
 
                     //Check if Material Sample
-                    if (workflowId == "10C37E39-66F9-424F-B575-3A2060C2F395")
+                    if (sample.SampleType.PhraseId == PhraseSampType.PhraseIdMATERIAL)
                     {
                         node.DisplayText = $"{sample.SampleName} ({sample.FtiMaterialType.PhraseText})";
                     }
 
                     //Check if Statistical Sample
-                    if (workflowId == "08962026-AE43-438F-89CF-30E6F04C2D6D")
+                    if (sample.SampleType.PhraseId == PhraseSampType.PhraseIdAVERAGE)
                     {
-                        node.DisplayText = language == "EN-GB" ? StatisticalSampleEn : StatisticalSampleGr;
-                    }
+                        var statisticalSampleTemplate = EntityManager.SelectLatestVersion<EntityTemplate>(StatisticalSampleEntityId);
+                        if (sample.EntityTemplate == statisticalSampleTemplate)
+                        {
+                            node.DisplayText = language == "EN-GB" ? StatisticalSampleEn : StatisticalSampleGr;
+                        }
+                        else //Check if Statistical/Storage Sample
+                        {
+                            node.DisplayText = language == "EN-GB" ? StorageStatisticalSampleEn : StorageStatisticalSampleGr;
 
-                    //Check if Statistical/Storage Sample
-                    if (workflowId == "4E9191F5-FE7C-4B09-BE99-E2FAD91B311B")
-                    {
-                        node.DisplayText = language == "EN-GB" ? StorageStatisticalSampleEn : StorageStatisticalSampleGr;
-
-                        node.DisplayText = $"{node.DisplayText} {sample.FtiMediaType.ToString()} ({sample.FtiTimepoint.ToString()}{sample.FtiTimeUnit.Trim()} {sample.FtiTemperature.ToString()}{sample.FtiTempUnit.Trim()})";
+                            node.DisplayText = $"{node.DisplayText} {sample.FtiMediaType.ToString()} ({sample.FtiTimepoint.ToString()}{sample.FtiTimeUnit.Trim()} {sample.FtiTemperature.ToString()}{sample.FtiTempUnit.Trim()})";
+                        }
                     }
 
                     //Check if Replicate Sample
@@ -411,7 +418,7 @@ namespace Customization.Tasks
 
                     string testDisplayText = string.Empty;
 
-                    if (testRow is null)
+                    if (testRow is null || isStartup)
                     {
                         testDisplayText = GetTestDisplayText(test, test.ComponentListEntity, test.FtiCreateReplicate);
                     }
@@ -469,8 +476,7 @@ namespace Customization.Tasks
         {
             try
             {
-                //Suppress node addition events
-                _treeList.SuppressAddEvents = true;
+                TurnOnStartupConfig();
 
                 if (m_RootNode.DisplayText == "Jobs")
                 {
@@ -498,7 +504,7 @@ namespace Customization.Tasks
                     }
                 }
 
-                _treeList.SuppressAddEvents = false;
+                TurnOffStartupConfig();
             }
             catch (Exception ex)
             {
@@ -506,6 +512,19 @@ namespace Customization.Tasks
                 Logger.Error(ex.Message);
                 _treeList.SuppressAddEvents = false;
             }
+        }
+
+        private void TurnOnStartupConfig()
+        {
+            //Suppress node addition events
+            _treeList.SuppressAddEvents = true;
+            isStartup = true;
+        }
+
+        private void TurnOffStartupConfig()
+        {
+            _treeList.SuppressAddEvents = false;
+            isStartup = false;
         }
 
         private void UpdateSampleDisplayTextByCollection(IEntityCollection samples)
