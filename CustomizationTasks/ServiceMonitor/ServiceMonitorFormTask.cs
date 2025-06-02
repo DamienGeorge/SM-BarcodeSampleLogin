@@ -384,17 +384,21 @@ namespace Customization.Tasks
             var runTime = query.RunTime;
             var pendingTasks = query.PendingTasks;
 
-            var message = $"Timerqueue Service : \n {pendingTasks} active tasks pending. \n Last run time at {runTime}";
+            var message = $"Timerqueue Service : \r\n {pendingTasks} tasks pending before next Canary Task run. " +
+                $"\n {query.SuspendedTasks} suspended timerqueue tasks out of {query.TotalTasks} total tasks" +
+                $"\r\n Next canary run time at {runTime.ToSampleManagerString(EntityManager)}";
+
             m_Form.TimerqueueLabel.Caption = message;
 
             if ((DateTime.Now - runTime.Value) > wdtInterval && pendingTasks < queueLength)
             {
-                m_Form.TimerqueueLabel.ForeColor = failColor;
+                m_Form.TimerqueueLabel.BackColor = failColor;
                 IsTimerqueueRunning = false;
             }
             else
             {
                 IsTimerqueueRunning = true;
+                m_Form.TimerqueueLabel.BackColor = TimerqueueLabelColor;
             }
         }
     }
