@@ -133,7 +133,11 @@ namespace Customization.Tasks
             queueLength = m_VglGlobalService.GetGlobalInt("MONITOR_WDT_FAIL_QUEUE_LENGTH");
 
             mailReportConfig = Library.Environment.GetGlobalString("MONITOR_WORKFLOW");
-            mailWorkflow = EntityManager.SelectLatestVersion<Workflow>(new Identity(mailReportConfig));
+            if (mailReportConfig == null)
+            {
+                mailWorkflow = EntityManager.SelectLatestVersion<Workflow>(new Identity(mailReportConfig));
+            }
+
             mailFrequency = m_VglGlobalService.GetGlobalInterval("MONITOR_MAIL_FREQUENCY");
         }
 
@@ -268,7 +272,6 @@ namespace Customization.Tasks
             logEntry.DeliveryErrors = errorMessage;
             logEntry.SentOn = DateTime.Now;
             logEntry.ErrorType = EntityManager.SelectPhrase(PhraseErrorType.Identity, errorPhrase).ToString();
-            logEntry.Status = mailContent.Is_Not_NullWhitespaceOrEmpty();
 
 
             EntityManager.Transaction.Add(logEntry);
@@ -389,6 +392,7 @@ namespace Customization.Tasks
                 $"\r\n Next canary run time at {runTime.ToSampleManagerString(EntityManager)}";
 
             m_Form.TimerqueueLabel.Caption = message;
+
 
             if ((DateTime.Now - runTime.Value) > wdtInterval && pendingTasks < queueLength)
             {
