@@ -393,6 +393,7 @@ namespace Customization.Tasks
 
             m_Form.TimerqueueLabel.Caption = message;
 
+            //TODO Runtime returns null
 
             if ((DateTime.Now - runTime.Value) > wdtInterval && pendingTasks < queueLength)
             {
