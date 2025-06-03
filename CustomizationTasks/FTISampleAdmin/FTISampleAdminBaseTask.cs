@@ -97,11 +97,6 @@ namespace Customization.Tasks
                         node.DisplayText = $"{jobHeader.FtiSapNumber} {jobHeader.BrowseDescription}";
                     }
                 }
-                //TODO - To remove
-                else
-                {
-                    node.DisplayText = jobHeader.BrowseDescription;
-                }
             }
         }
 
@@ -174,7 +169,6 @@ namespace Customization.Tasks
 
                     if (node != null)
                     {
-                        var workflowId = sample.WorkflowNode.WorkflowId;
 
                         //Check if Miscellaneous Sample
                         if (sample.SampleType.PhraseId == PhraseSampType.PhraseIdMISC_SUMM)
@@ -204,17 +198,6 @@ namespace Customization.Tasks
                             }
                         }
 
-                        //TODO - Remove, only for testing
-                        if (workflowId == "D59530B7-C992-4144-8B38-382FA72F1584")
-                        {
-                            node.DisplayText = $"Storage ({row.GetValue("SampleName")} , {row.GetValue("Description")})";
-                        }
-
-                        if (workflowId == "599868F0-CDD5-4F8D-B590-F3E588B98406")
-                        {
-                            node.DisplayText = $"Sub-Sample ({row.GetValue("SampleName")} {row.GetValue("Description")})";
-                        }
-
                         GetTestData(sample, node);
                     }
                 }
@@ -231,8 +214,6 @@ namespace Customization.Tasks
             {
                 if (node.Data is Sample sample)
                 {
-                    var workflowId = sample.WorkflowNode.WorkflowId;
-
                     //Check if Miscellaneous Sample
                     if (sample.SampleType.PhraseId == PhraseSampType.PhraseIdMISC_SUMM)
                     {
@@ -265,17 +246,6 @@ namespace Customization.Tasks
                     if (sample.SampleType.PhraseId == PhraseSampType.PhraseIdREPLICATE)
                     {
                         node.DisplayText = language == "EN-GB" ? $"Replicate {sample.IdText.Substring(sample.IdText.IndexOf('R'))}" : $"Replikate {sample.IdText.Substring(sample.IdText.IndexOf('R'))}";
-                    }
-
-                    //TODO - Remove, only for testing
-                    if (workflowId == "D59530B7-C992-4144-8B38-382FA72F1584")
-                    {
-                        node.DisplayText = $"Storage ({sample.SampleName} , {sample.Description})";
-                    }
-
-                    if (workflowId == "599868F0-CDD5-4F8D-B590-F3E588B98406")
-                    {
-                        node.DisplayText = $"Sub-Sample ({sample.SampleName} , {sample.Description})";
                     }
 
                     GetTestData(sample, node);
