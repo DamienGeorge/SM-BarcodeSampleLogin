@@ -84,18 +84,13 @@ namespace Customization.Tasks
         {
             if (node != null)
             {
-
-                if (jobHeader.WorkflowNode.WorkflowId == "09CB4052-A593-487F-B72E-38932F91C901"
-                    || jobHeader.WorkflowNode.WorkflowId == "89F8D090-DD59-457C-B7CD-EC37FFB2EE87")
+                if (e is not null)
                 {
-                    if (e is not null)
-                    {
-                        node.DisplayText = $"{e.Row.GetValue(JobHeaderPropertyNames.FtiSapNumber)} {e.Row.GetValue(JobHeaderPropertyNames.BrowseDescription)}";
-                    }
-                    else
-                    {
-                        node.DisplayText = $"{jobHeader.FtiSapNumber} {jobHeader.BrowseDescription}";
-                    }
+                    node.DisplayText = $"{e.Row.GetValue(JobHeaderPropertyNames.FtiSapNumber)} {e.Row.GetValue(JobHeaderPropertyNames.BrowseDescription)}";
+                }
+                else
+                {
+                    node.DisplayText = $"{jobHeader.FtiSapNumber} {jobHeader.BrowseDescription}";
                 }
             }
         }
