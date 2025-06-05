@@ -12,25 +12,25 @@ namespace CustomizationWebApi.FTI
     /// <seealso cref="SampleManagerWebApiTask" />
     [SampleManagerWebApi("fti")]
     [OpenApiBasePath("/")]
-    public class FTIOrderManagement : SampleManagerWebApiTask
+    public class FTICostManagement : SampleManagerWebApiTask
     {
         #region Endpoints
         [WebInvoke(UriTemplate = "fti/OrderDetail", Method = "POST")]
         [OpenApiOperation(Description = "Receives data regarding OrderDetails")]
         [OpenApiTag("FTI")]
-        public bool FetchOrderDetails(string ftiPlantID)
+        public bool FetchOrderDetails(FTIOrderDetail fTIOrderDetail)
         {
             try
             {
-                Logger.Info($"Starting FetchOrderDetails for order number: {ftiPlantID}");
+                Logger.Info($"Starting FetchOrderDetails for order number: {fTIOrderDetail.OrderNumber}");
 
-                if (string.IsNullOrEmpty(ftiPlantID))
+                if (string.IsNullOrEmpty(fTIOrderDetail.OrderNumber))
                 {
                     Logger.Error("Order number is null or empty");
-                    throw new ArgumentException("Order number cannot be null or empty", nameof(ftiPlantID));
+                    throw new ArgumentException("Order number cannot be null or empty", nameof(fTIOrderDetail));
                 }
 
-                ProcessSoapClient(ftiPlantID).Wait();
+                ProcessSoapClient(fTIOrderDetail.OrderNumber).Wait();
             
                 return true;
             }

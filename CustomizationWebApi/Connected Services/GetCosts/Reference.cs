@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace FTI
+namespace CustomizationWebApi.Client.Cost
 {
     
     
@@ -18,7 +18,7 @@ namespace FTI
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:sap-com:document:sap:rfc:functions:zLIMS_ACT_COSTS_GET:Z_QM_ACT_COSTSRequest", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        System.Threading.Tasks.Task<FTI.Z_QM_ACT_COSTSResponse1> Z_QM_ACT_COSTSAsync(FTI.Z_QM_ACT_COSTSRequest request);
+        System.Threading.Tasks.Task<Z_QM_ACT_COSTSResponse1> Z_QM_ACT_COSTSAsync(Z_QM_ACT_COSTSRequest request);
     }
     
     /// <remarks/>
@@ -703,13 +703,13 @@ namespace FTI
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:sap-com:document:sap:rfc:functions", Order=0)]
-        public FTI.Z_QM_ACT_COSTS Z_QM_ACT_COSTS;
+        public Z_QM_ACT_COSTS Z_QM_ACT_COSTS;
         
         public Z_QM_ACT_COSTSRequest()
         {
         }
         
-        public Z_QM_ACT_COSTSRequest(FTI.Z_QM_ACT_COSTS Z_QM_ACT_COSTS)
+        public Z_QM_ACT_COSTSRequest(Z_QM_ACT_COSTS Z_QM_ACT_COSTS)
         {
             this.Z_QM_ACT_COSTS = Z_QM_ACT_COSTS;
         }
@@ -723,26 +723,26 @@ namespace FTI
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:sap-com:document:sap:rfc:functions", Order=0)]
-        public FTI.Z_QM_ACT_COSTSResponse Z_QM_ACT_COSTSResponse;
+        public Z_QM_ACT_COSTSResponse Z_QM_ACT_COSTSResponse;
         
         public Z_QM_ACT_COSTSResponse1()
         {
         }
         
-        public Z_QM_ACT_COSTSResponse1(FTI.Z_QM_ACT_COSTSResponse Z_QM_ACT_COSTSResponse)
+        public Z_QM_ACT_COSTSResponse1(Z_QM_ACT_COSTSResponse Z_QM_ACT_COSTSResponse)
         {
             this.Z_QM_ACT_COSTSResponse = Z_QM_ACT_COSTSResponse;
         }
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
-    public interface zLIMS_ACT_COSTS_GETChannel : FTI.zLIMS_ACT_COSTS_GET, System.ServiceModel.IClientChannel
+    public interface zLIMS_ACT_COSTS_GETChannel : zLIMS_ACT_COSTS_GET, System.ServiceModel.IClientChannel
     {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
-    public partial class zLIMS_ACT_COSTS_GETClient : System.ServiceModel.ClientBase<FTI.zLIMS_ACT_COSTS_GET>, FTI.zLIMS_ACT_COSTS_GET
+    public partial class zLIMS_ACT_COSTS_GETClient : System.ServiceModel.ClientBase<zLIMS_ACT_COSTS_GET>, zLIMS_ACT_COSTS_GET
     {
         
         /// <summary>
@@ -786,16 +786,16 @@ namespace FTI
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<FTI.Z_QM_ACT_COSTSResponse1> FTI.zLIMS_ACT_COSTS_GET.Z_QM_ACT_COSTSAsync(FTI.Z_QM_ACT_COSTSRequest request)
+        System.Threading.Tasks.Task<Z_QM_ACT_COSTSResponse1> zLIMS_ACT_COSTS_GET.Z_QM_ACT_COSTSAsync(Z_QM_ACT_COSTSRequest request)
         {
             return base.Channel.Z_QM_ACT_COSTSAsync(request);
         }
         
-        public System.Threading.Tasks.Task<FTI.Z_QM_ACT_COSTSResponse1> Z_QM_ACT_COSTSAsync(FTI.Z_QM_ACT_COSTS Z_QM_ACT_COSTS)
+        public System.Threading.Tasks.Task<Z_QM_ACT_COSTSResponse1> Z_QM_ACT_COSTSAsync(Z_QM_ACT_COSTS Z_QM_ACT_COSTS)
         {
-            FTI.Z_QM_ACT_COSTSRequest inValue = new FTI.Z_QM_ACT_COSTSRequest();
+            Z_QM_ACT_COSTSRequest inValue = new Z_QM_ACT_COSTSRequest();
             inValue.Z_QM_ACT_COSTS = Z_QM_ACT_COSTS;
-            return ((FTI.zLIMS_ACT_COSTS_GET)(this)).Z_QM_ACT_COSTSAsync(inValue);
+            return ((zLIMS_ACT_COSTS_GET)(this)).Z_QM_ACT_COSTSAsync(inValue);
         }
         
         public virtual System.Threading.Tasks.Task OpenAsync()

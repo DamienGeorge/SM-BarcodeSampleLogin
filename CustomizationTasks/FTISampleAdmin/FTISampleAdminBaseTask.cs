@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using Thermo.Framework.Core;
 using Thermo.SampleManager.Common.Data;
 using Thermo.SampleManager.Library.ClientControls;
@@ -58,6 +59,13 @@ namespace Customization.Tasks
             Library = library;
             Logger = logger;
             EntityManager = entityManager;
+
+            MainForm.Saved += MainForm_Saved;
+        }
+
+        private void MainForm_Saved(object sender, SavedEventArgs e)
+        {
+            UpdateTreeList(_treeList.Nodes[0]);
         }
 
         /// <summary>
@@ -240,7 +248,8 @@ namespace Customization.Tasks
                     //Check if Replicate Sample
                     if (sample.SampleType.PhraseId == PhraseSampType.PhraseIdREPLICATE)
                     {
-                        node.DisplayText = language == "EN-GB" ? $"Replicate {sample.IdText.Substring(sample.IdText.IndexOf('R'))}" : $"Replikate {sample.IdText.Substring(sample.IdText.IndexOf('R'))}";
+                        string sampleString = sample.IdText.Substring(sample.IdText.IndexOf('R'));
+                        node.DisplayText = language == "EN-GB" ? $"Replicate {sampleString}" : $"Replikate {sampleString}";
                     }
 
                     GetTestData(sample, node);
@@ -378,10 +387,15 @@ namespace Customization.Tasks
             {
                 foreach (var test in tests)
                 {
+
                     //check is test exists in testPropertyGrid, in which case it hasn't been updated on the test yet
                     var testRow = _testPropertyGrid.Rows.Where(x => x.Tag == test).FirstOrDefault();
 
                     string testDisplayText = string.Empty;
+                    if (test.IsNew() == false)
+                    {
+                        UpdateTestDisplayTextByTestRow(testRow);
+                    }
 
                     if (testRow is null || isStartup)
                     {
@@ -427,9 +441,24 @@ namespace Customization.Tasks
         /// <param name="e"></param>
         private void TreeListItems_NodeAdded(object sender, SimpleTreeListNodeEventArgs e)
         {
-            if (e.Node.Data is Sample)
+            if (e.Node.Data is Sample sample)
             {
-                UpdateSampleDisplayTextByNode(e.Node);
+                //TODO - If test is on selected sample. it will not render.
+                var gridSample = _samplePropertyGrid.Rows.Where(x => x.Tag == sample).FirstOrDefault();
+                if (gridSample is not null)
+                {
+                    UpdateSampleDisplayTextByRow(gridSample);
+                }
+                else
+                {
+                    UpdateSampleDisplayTextByNode(e.Node);
+                }
+            }
+
+            if (e.Node.Data is JobHeader job)
+            {
+                var node = _treeList.FindNodeByData(job);
+                UpdateJobDisplayText(job, node);
             }
         }
 
@@ -443,7 +472,7 @@ namespace Customization.Tasks
             {
                 TurnOnStartupConfig();
 
-                if (m_RootNode.DisplayText == "Jobs")
+                if (m_RootNode.FirstNode?.Data is JobHeader)
                 {
                     foreach (var node in m_RootNode.Nodes)
                     {
@@ -456,7 +485,7 @@ namespace Customization.Tasks
 
                     }
                 }
-                else if (m_RootNode.DisplayText == "Samples")
+                else if (m_RootNode.FirstNode?.Data is Sample)
                 {
                     foreach (var node in m_RootNode.Nodes)
                     {

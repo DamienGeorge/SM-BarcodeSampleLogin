@@ -34,5 +34,11 @@ namespace Customization.Tasks
                 column.SetCellBrowse(row, methodBrowse);
             }
         }
+
+        protected override void OnPostSave()
+        {
+            base.OnPostSave();
+            fTISampleAdminBase.UpdateTreeList(m_RootNode);
+        }
     }
 }
