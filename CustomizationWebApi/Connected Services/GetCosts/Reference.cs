@@ -7,31 +7,35 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System.Runtime.Serialization;
+using System.Xml.Serialization;
+
 namespace CustomizationWebApi.Client.Cost
 {
-    
-    
+
+
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
-    [System.ServiceModel.ServiceContractAttribute(Namespace="urn:sap-com:document:sap:rfc:functions", ConfigurationName="FTI.zLIMS_ACT_COSTS_GET")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace = "urn:sap-com:document:sap:rfc:functions", ConfigurationName = "FTI.zLIMS_ACT_COSTS_GET")]
     public interface zLIMS_ACT_COSTS_GET
     {
-        
-        [System.ServiceModel.OperationContractAttribute(Action="urn:sap-com:document:sap:rfc:functions:zLIMS_ACT_COSTS_GET:Z_QM_ACT_COSTSRequest", ReplyAction="*")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+
+        [System.ServiceModel.OperationContractAttribute(Action = "urn:sap-com:document:sap:rfc:functions:zLIMS_ACT_COSTS_GET:Z_QM_ACT_COSTSRequest", ReplyAction = "*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults = true)]
         System.Threading.Tasks.Task<Z_QM_ACT_COSTSResponse1> Z_QM_ACT_COSTSAsync(Z_QM_ACT_COSTSRequest request);
     }
-    
+
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="urn:sap-com:document:sap:rfc:functions")]
+    [DataContract(Namespace = "urn")]
+    [XmlType(Namespace = "urn:sap-com:document:sap:rfc:functions")]
     public partial class Z_QM_ACT_COSTS
     {
-        
+
         private string iV_PLANTField;
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 0)]
         public string IV_PLANT
         {
             get
@@ -44,44 +48,44 @@ namespace CustomizationWebApi.Client.Cost
             }
         }
     }
-    
+
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:sap-com:document:sap:rfc:functions")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:sap-com:document:sap:rfc:functions")]
     public partial class BAPIRET2
     {
-        
+
         private string tYPEField;
-        
+
         private string idField;
-        
+
         private string nUMBERField;
-        
+
         private string mESSAGEField;
-        
+
         private string lOG_NOField;
-        
+
         private string lOG_MSG_NOField;
-        
+
         private string mESSAGE_V1Field;
-        
+
         private string mESSAGE_V2Field;
-        
+
         private string mESSAGE_V3Field;
-        
+
         private string mESSAGE_V4Field;
-        
+
         private string pARAMETERField;
-        
+
         private int rOWField;
-        
+
         private string fIELDField;
-        
+
         private string sYSTEMField;
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 0)]
         public string TYPE
         {
             get
@@ -93,9 +97,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.tYPEField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=1)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 1)]
         public string ID
         {
             get
@@ -107,9 +111,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.idField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=2)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 2)]
         public string NUMBER
         {
             get
@@ -121,9 +125,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.nUMBERField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=3)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 3)]
         public string MESSAGE
         {
             get
@@ -135,9 +139,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.mESSAGEField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=4)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 4)]
         public string LOG_NO
         {
             get
@@ -149,9 +153,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.lOG_NOField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=5)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 5)]
         public string LOG_MSG_NO
         {
             get
@@ -163,9 +167,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.lOG_MSG_NOField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=6)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 6)]
         public string MESSAGE_V1
         {
             get
@@ -177,9 +181,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.mESSAGE_V1Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=7)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 7)]
         public string MESSAGE_V2
         {
             get
@@ -191,9 +195,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.mESSAGE_V2Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=8)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 8)]
         public string MESSAGE_V3
         {
             get
@@ -205,9 +209,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.mESSAGE_V3Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=9)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 9)]
         public string MESSAGE_V4
         {
             get
@@ -219,9 +223,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.mESSAGE_V4Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=10)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 10)]
         public string PARAMETER
         {
             get
@@ -233,9 +237,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.pARAMETERField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=11)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 11)]
         public int ROW
         {
             get
@@ -247,9 +251,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.rOWField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=12)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 12)]
         public string FIELD
         {
             get
@@ -261,9 +265,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.fIELDField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=13)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 13)]
         public string SYSTEM
         {
             get
@@ -276,62 +280,62 @@ namespace CustomizationWebApi.Client.Cost
             }
         }
     }
-    
+
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:sap-com:document:sap:rfc:functions")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:sap-com:document:sap:rfc:functions")]
     public partial class ZQM_S_ACT_COSTS
     {
-        
+
         private string wERKSField;
-        
+
         private string aRBPLField;
-        
+
         private string kOKRSField;
-        
+
         private string kOSTLField;
-        
+
         private string lSTARField;
-        
+
         private string gJAHRField;
-        
+
         private string uNITField;
-        
+
         private decimal tKG001Field;
-        
+
         private decimal tKG002Field;
-        
+
         private decimal tKG003Field;
-        
+
         private decimal tKG004Field;
-        
+
         private decimal tKG005Field;
-        
+
         private decimal tKG006Field;
-        
+
         private decimal tKG007Field;
-        
+
         private decimal tKG008Field;
-        
+
         private decimal tKG009Field;
-        
+
         private decimal tKG010Field;
-        
+
         private decimal tKG011Field;
-        
+
         private decimal tKG012Field;
-        
+
         private decimal tKG013Field;
-        
+
         private decimal tKG014Field;
-        
+
         private decimal tKG015Field;
-        
+
         private decimal tKG016Field;
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 0)]
         public string WERKS
         {
             get
@@ -343,9 +347,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.wERKSField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=1)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 1)]
         public string ARBPL
         {
             get
@@ -357,9 +361,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.aRBPLField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=2)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 2)]
         public string KOKRS
         {
             get
@@ -371,9 +375,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.kOKRSField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=3)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 3)]
         public string KOSTL
         {
             get
@@ -385,9 +389,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.kOSTLField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=4)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 4)]
         public string LSTAR
         {
             get
@@ -399,9 +403,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.lSTARField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=5)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 5)]
         public string GJAHR
         {
             get
@@ -413,9 +417,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.gJAHRField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=6)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 6)]
         public string UNIT
         {
             get
@@ -427,9 +431,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.uNITField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=7)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 7)]
         public decimal TKG001
         {
             get
@@ -441,9 +445,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.tKG001Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=8)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 8)]
         public decimal TKG002
         {
             get
@@ -455,9 +459,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.tKG002Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=9)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 9)]
         public decimal TKG003
         {
             get
@@ -469,9 +473,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.tKG003Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=10)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 10)]
         public decimal TKG004
         {
             get
@@ -483,9 +487,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.tKG004Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=11)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 11)]
         public decimal TKG005
         {
             get
@@ -497,9 +501,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.tKG005Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=12)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 12)]
         public decimal TKG006
         {
             get
@@ -511,9 +515,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.tKG006Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=13)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 13)]
         public decimal TKG007
         {
             get
@@ -525,9 +529,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.tKG007Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=14)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 14)]
         public decimal TKG008
         {
             get
@@ -539,9 +543,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.tKG008Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=15)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 15)]
         public decimal TKG009
         {
             get
@@ -553,9 +557,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.tKG009Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=16)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 16)]
         public decimal TKG010
         {
             get
@@ -567,9 +571,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.tKG010Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=17)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 17)]
         public decimal TKG011
         {
             get
@@ -581,9 +585,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.tKG011Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=18)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 18)]
         public decimal TKG012
         {
             get
@@ -595,9 +599,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.tKG012Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=19)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 19)]
         public decimal TKG013
         {
             get
@@ -609,9 +613,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.tKG013Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=20)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 20)]
         public decimal TKG014
         {
             get
@@ -623,9 +627,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.tKG014Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=21)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 21)]
         public decimal TKG015
         {
             get
@@ -637,9 +641,9 @@ namespace CustomizationWebApi.Client.Cost
                 this.tKG015Field = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=22)]
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 22)]
         public decimal TKG016
         {
             get
@@ -652,21 +656,21 @@ namespace CustomizationWebApi.Client.Cost
             }
         }
     }
-    
+
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="urn:sap-com:document:sap:rfc:functions")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:sap-com:document:sap:rfc:functions")]
     public partial class Z_QM_ACT_COSTSResponse
     {
-        
+
         private ZQM_S_ACT_COSTS[] eT_COSTSField;
-        
+
         private BAPIRET2[] eT_RETURNField;
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=0)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("item", Form=System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable=false)]
+        [System.Xml.Serialization.XmlArrayAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("item", Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = false)]
         public ZQM_S_ACT_COSTS[] ET_COSTS
         {
             get
@@ -678,10 +682,10 @@ namespace CustomizationWebApi.Client.Cost
                 this.eT_COSTSField = value;
             }
         }
-        
+
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=1)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("item", Form=System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable=false)]
+        [System.Xml.Serialization.XmlArrayAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, Order = 1)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("item", Form = System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable = false)]
         public BAPIRET2[] ET_RETURN
         {
             get
@@ -694,115 +698,118 @@ namespace CustomizationWebApi.Client.Cost
             }
         }
     }
-    
+
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped = false)]
     public partial class Z_QM_ACT_COSTSRequest
     {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:sap-com:document:sap:rfc:functions", Order=0)]
+
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace = "urn:sap-com:document:sap:rfc:functions", Order = 0)]
         public Z_QM_ACT_COSTS Z_QM_ACT_COSTS;
-        
+
         public Z_QM_ACT_COSTSRequest()
         {
         }
-        
+
         public Z_QM_ACT_COSTSRequest(Z_QM_ACT_COSTS Z_QM_ACT_COSTS)
         {
             this.Z_QM_ACT_COSTS = Z_QM_ACT_COSTS;
         }
     }
-    
+
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped = false)]
     public partial class Z_QM_ACT_COSTSResponse1
     {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:sap-com:document:sap:rfc:functions", Order=0)]
+
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace = "urn:sap-com:document:sap:rfc:functions", Order = 0)]
         public Z_QM_ACT_COSTSResponse Z_QM_ACT_COSTSResponse;
-        
+
         public Z_QM_ACT_COSTSResponse1()
         {
         }
-        
+
         public Z_QM_ACT_COSTSResponse1(Z_QM_ACT_COSTSResponse Z_QM_ACT_COSTSResponse)
         {
             this.Z_QM_ACT_COSTSResponse = Z_QM_ACT_COSTSResponse;
         }
     }
-    
+
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
     public interface zLIMS_ACT_COSTS_GETChannel : zLIMS_ACT_COSTS_GET, System.ServiceModel.IClientChannel
     {
     }
-    
+
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
     public partial class zLIMS_ACT_COSTS_GETClient : System.ServiceModel.ClientBase<zLIMS_ACT_COSTS_GET>, zLIMS_ACT_COSTS_GET
     {
-        
+
         /// <summary>
         /// Implement this partial method to configure the service endpoint.
         /// </summary>
         /// <param name="serviceEndpoint">The endpoint to configure</param>
         /// <param name="clientCredentials">The client credentials</param>
-        static partial void ConfigureEndpoint(System.ServiceModel.Description.ServiceEndpoint serviceEndpoint, System.ServiceModel.Description.ClientCredentials clientCredentials);
-        
-        public zLIMS_ACT_COSTS_GETClient() : 
+        static void ConfigureEndpoint(System.ServiceModel.Description.ServiceEndpoint serviceEndpoint, System.ServiceModel.Description.ClientCredentials clientCredentials)
+        {
+            HelperClass.ConfigureCredentials(serviceEndpoint, clientCredentials);
+        }
+
+        public zLIMS_ACT_COSTS_GETClient() :
                 base(zLIMS_ACT_COSTS_GETClient.GetDefaultBinding(), zLIMS_ACT_COSTS_GETClient.GetDefaultEndpointAddress())
         {
             this.Endpoint.Name = EndpointConfiguration.ZLIMS_ACT_COSTS_GET_WS.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
-        
-        public zLIMS_ACT_COSTS_GETClient(EndpointConfiguration endpointConfiguration) : 
+
+        public zLIMS_ACT_COSTS_GETClient(EndpointConfiguration endpointConfiguration) :
                 base(zLIMS_ACT_COSTS_GETClient.GetBindingForEndpoint(endpointConfiguration), zLIMS_ACT_COSTS_GETClient.GetEndpointAddress(endpointConfiguration))
         {
             this.Endpoint.Name = endpointConfiguration.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
-        
-        public zLIMS_ACT_COSTS_GETClient(EndpointConfiguration endpointConfiguration, string remoteAddress) : 
+
+        public zLIMS_ACT_COSTS_GETClient(EndpointConfiguration endpointConfiguration, string remoteAddress) :
                 base(zLIMS_ACT_COSTS_GETClient.GetBindingForEndpoint(endpointConfiguration), new System.ServiceModel.EndpointAddress(remoteAddress))
         {
             this.Endpoint.Name = endpointConfiguration.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
-        
-        public zLIMS_ACT_COSTS_GETClient(EndpointConfiguration endpointConfiguration, System.ServiceModel.EndpointAddress remoteAddress) : 
+
+        public zLIMS_ACT_COSTS_GETClient(EndpointConfiguration endpointConfiguration, System.ServiceModel.EndpointAddress remoteAddress) :
                 base(zLIMS_ACT_COSTS_GETClient.GetBindingForEndpoint(endpointConfiguration), remoteAddress)
         {
             this.Endpoint.Name = endpointConfiguration.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
-        
-        public zLIMS_ACT_COSTS_GETClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
+
+        public zLIMS_ACT_COSTS_GETClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) :
                 base(binding, remoteAddress)
         {
         }
-        
+
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         System.Threading.Tasks.Task<Z_QM_ACT_COSTSResponse1> zLIMS_ACT_COSTS_GET.Z_QM_ACT_COSTSAsync(Z_QM_ACT_COSTSRequest request)
         {
             return base.Channel.Z_QM_ACT_COSTSAsync(request);
         }
-        
+
         public System.Threading.Tasks.Task<Z_QM_ACT_COSTSResponse1> Z_QM_ACT_COSTSAsync(Z_QM_ACT_COSTS Z_QM_ACT_COSTS)
         {
             Z_QM_ACT_COSTSRequest inValue = new Z_QM_ACT_COSTSRequest();
             inValue.Z_QM_ACT_COSTS = Z_QM_ACT_COSTS;
             return ((zLIMS_ACT_COSTS_GET)(this)).Z_QM_ACT_COSTSAsync(inValue);
         }
-        
+
         public virtual System.Threading.Tasks.Task OpenAsync()
         {
             return System.Threading.Tasks.Task.Factory.FromAsync(((System.ServiceModel.ICommunicationObject)(this)).BeginOpen(null, null), new System.Action<System.IAsyncResult>(((System.ServiceModel.ICommunicationObject)(this)).EndOpen));
         }
-        
+
         private static System.ServiceModel.Channels.Binding GetBindingForEndpoint(EndpointConfiguration endpointConfiguration)
         {
             if ((endpointConfiguration == EndpointConfiguration.ZLIMS_ACT_COSTS_GET_WS))
@@ -817,7 +824,7 @@ namespace CustomizationWebApi.Client.Cost
             }
             throw new System.InvalidOperationException(string.Format("Could not find endpoint with name \'{0}\'.", endpointConfiguration));
         }
-        
+
         private static System.ServiceModel.EndpointAddress GetEndpointAddress(EndpointConfiguration endpointConfiguration)
         {
             if ((endpointConfiguration == EndpointConfiguration.ZLIMS_ACT_COSTS_GET_WS))
@@ -827,20 +834,20 @@ namespace CustomizationWebApi.Client.Cost
             }
             throw new System.InvalidOperationException(string.Format("Could not find endpoint with name \'{0}\'.", endpointConfiguration));
         }
-        
+
         private static System.ServiceModel.Channels.Binding GetDefaultBinding()
         {
             return zLIMS_ACT_COSTS_GETClient.GetBindingForEndpoint(EndpointConfiguration.ZLIMS_ACT_COSTS_GET_WS);
         }
-        
+
         private static System.ServiceModel.EndpointAddress GetDefaultEndpointAddress()
         {
             return zLIMS_ACT_COSTS_GETClient.GetEndpointAddress(EndpointConfiguration.ZLIMS_ACT_COSTS_GET_WS);
         }
-        
+
         public enum EndpointConfiguration
         {
-            
+
             ZLIMS_ACT_COSTS_GET_WS,
         }
     }

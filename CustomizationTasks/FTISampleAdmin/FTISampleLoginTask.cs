@@ -15,7 +15,7 @@ namespace Customization.Tasks
         protected override void MainFormLoaded()
         {
             base.MainFormLoaded();
-            fTISampleAdminBase = new FTISampleAdminBaseTask(m_Form, Library, Logger, EntityManager);
+            fTISampleAdminBase = new FTISampleAdminBaseTask(m_Form, Library, Logger, EntityManager, Context.LaunchMode);
         }
 
         protected override void SetupTestGridColumn(Test test, EntityTemplatePropertyInternal templateProperty, UnboundGridRow row, UnboundGridColumn column)
@@ -30,7 +30,7 @@ namespace Customization.Tasks
             if (templateProperty.PropertyName == TestPropertyNames.FtiAnalysisMethod)
             {
                 EntityBrowse methodBrowse = base.BrowseFactory.CreateEntityBrowse(test.Analysis.FtiAnalysisMethods);
-                methodBrowse.ReturnProperty = "Name";
+                methodBrowse.ReturnProperty = FtiAnalysisMethodPropertyNames.MethodName;
                 column.SetCellBrowse(row, methodBrowse);
             }
         }

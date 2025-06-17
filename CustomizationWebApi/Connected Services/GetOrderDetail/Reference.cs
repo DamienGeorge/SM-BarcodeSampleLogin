@@ -14464,17 +14464,7 @@ namespace CustomizationWebApi.Client
         /// <param name="clientCredentials">The client credentials</param>
         public static void ConfigureEndpoint(System.ServiceModel.Description.ServiceEndpoint serviceEndpoint, System.ServiceModel.Description.ClientCredentials clientCredentials)
         {
-            byte[] credentialBuffer = new System.Text.UTF8Encoding().GetBytes("sb-f4714fc3-b963-429e-ac49-540a3d541483!b36509|it-rt-citscpicfdev!b16077" + ":" + "3c15038d-7367-4547-a278-fd4a8103e2bd$K9O5xJnpVoBv-bKLQT0Rcl46Mfi6DOutqJQuUxilnRg=");
-            var headers = new Dictionary<string, string>
-            {
-                {"Authorization", "Basic " + Convert.ToBase64String(credentialBuffer)}
-            };
-
-            var behavior = new AddHttpHeaderMessageEndpointBehavior(headers);
-            serviceEndpoint.EndpointBehaviors.Add(behavior);
-
-            clientCredentials.UserName.UserName = "sb-f4714fc3-b963-429e-ac49-540a3d541483!b36509|it-rt-citscpicfdev!b16077";
-            clientCredentials.UserName.Password = "3c15038d-7367-4547-a278-fd4a8103e2bd$K9O5xJnpVoBv-bKLQT0Rcl46Mfi6DOutqJQuUxilnRg=";
+            HelperClass.ConfigureCredentials(serviceEndpoint, clientCredentials);
         }
 
         public ZLIMS_BAPI_ALM_ORD_GET_DETAILClient() :

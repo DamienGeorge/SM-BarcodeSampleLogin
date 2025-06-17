@@ -20,6 +20,30 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DevExpress.Data.v22.1">
+      <HintPath>..\..\..\Exe\DevExpress.Data.v22.1.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Docs.v22.1">
+      <HintPath>..\..\..\Exe\DevExpress.Docs.v22.1.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Office.v22.1.Core">
+      <HintPath>..\..\..\Exe\DevExpress.Office.v22.1.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Printing.v22.1.Core">
+      <HintPath>..\..\..\Exe\DevExpress.Printing.v22.1.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.RichEdit.v22.1.Core">
+      <HintPath>..\..\..\Exe\DevExpress.RichEdit.v22.1.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Spreadsheet.v22.1.Core">
+      <HintPath>..\..\..\Exe\DevExpress.Spreadsheet.v22.1.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Thermo.Framework.Core">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Thermo.Framework.Core.dll</HintPath>
@@ -39,6 +63,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Thermo.SampleManager.Common.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="Thermo.SampleManager.Core">
+      <HintPath>..\..\..\Exe\Thermo.SampleManager.Core.dll</HintPath>
     </Reference>
     <Reference Include="Thermo.SampleManager.Internal.ObjectModel">
       <HintPath>..\..\..\Exe\Thermo.SampleManager.Internal.ObjectModel.dll</HintPath>

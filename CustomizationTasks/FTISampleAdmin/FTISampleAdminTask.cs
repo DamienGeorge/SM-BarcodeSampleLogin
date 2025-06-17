@@ -17,7 +17,7 @@ namespace Customization.Tasks
         {
             base.MainFormLoaded();
 
-            fTISampleAdminBaseTask = new FTISampleAdminBaseTask(m_Form, Library, Logger, EntityManager);
+            fTISampleAdminBaseTask = new FTISampleAdminBaseTask(m_Form, Library, Logger, EntityManager, base.Context.LaunchMode);
 
             UpdateAllNodes();
         }
@@ -39,7 +39,7 @@ namespace Customization.Tasks
             if (templateProperty.PropertyName == TestPropertyNames.FtiAnalysisMethod)
             {
                 EntityBrowse methodBrowse = base.BrowseFactory.CreateEntityBrowse(test.Analysis.FtiAnalysisMethods);
-                methodBrowse.ReturnProperty = "Name";
+                methodBrowse.ReturnProperty = FtiAnalysisMethodPropertyNames.MethodName;
                 column.SetCellBrowse(row, methodBrowse);
             }
         }

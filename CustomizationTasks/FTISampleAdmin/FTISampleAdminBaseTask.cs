@@ -33,19 +33,21 @@ namespace Customization.Tasks
         private UnboundGrid _jobPropertyGrid;
         private string language;
 
+        public FormSampleAdmin MainForm { get; }
         public StandardLibrary Library { get; }
         public Logger Logger { get; }
         public IEntityManager EntityManager { get; }
+        public string LaunchMode { get; }
+
         public bool isStartup = false;
 
-        public FTISampleAdminBaseTask(FormSampleAdmin MainForm, StandardLibrary library, Logger logger, IEntityManager entityManager)
+        public FTISampleAdminBaseTask(FormSampleAdmin MainForm, StandardLibrary library, Logger logger, IEntityManager entityManager, string launchMode)
         {
             _treeList = MainForm.TreeListItems;
             _testAssignmentGrid = MainForm.TestAssignmentGrid;
             _jobPropertyGrid = MainForm.GridJobProperties;
             _samplePropertyGrid = MainForm.GridSampleProperties;
             _testPropertyGrid = MainForm.GridTestProperties;
-
             _jobPropertyGrid.CellValueChanged += _jobPropertyGrid_CellValueChanged;
             _samplePropertyGrid.CellValueChanged += _samplePropertyGrid_CellValueChanged;
             _testPropertyGrid.CellValueChanged += _testPropertyGrid_CellValueChanged;
@@ -56,16 +58,11 @@ namespace Customization.Tasks
             _testAssignmentGrid.RowAdded += _testAssignmentGrid_RowAdded;
             _testAssignmentGrid.ColumnAdded += _testAssignmentGrid_ColumnAdded;
             language = ((Personnel)library.Environment.CurrentUser).Language.Identity;
+            this.MainForm = MainForm;
             Library = library;
             Logger = logger;
             EntityManager = entityManager;
-
-            MainForm.Saved += MainForm_Saved;
-        }
-
-        private void MainForm_Saved(object sender, SavedEventArgs e)
-        {
-            UpdateTreeList(_treeList.Nodes[0]);
+            LaunchMode = launchMode;
         }
 
         /// <summary>
@@ -182,7 +179,18 @@ namespace Customization.Tasks
                         //Check if Material Sample
                         if (sample.SampleType.PhraseId == PhraseSampType.PhraseIdMATERIAL)
                         {
-                            node.DisplayText = $"{row.GetValue(SamplePropertyNames.SampleName).ToString()} ({row.GetValue(SamplePropertyNames.FtiMaterialType)})";
+                            var phraseText = string.Empty;
+                            
+                            try
+                            {
+                                phraseText = (EntityManager.SelectPhrase(PhraseFtiMatype.Identity, row.GetValue(SamplePropertyNames.FtiMaterialType).ToString()) as Phrase).PhraseText;
+                            }
+                            catch
+                            {
+                                //do nothing. lazy null check 
+                            }
+
+                            node.DisplayText = $"{row.GetValue(SamplePropertyNames.SampleName).ToString()} ({phraseText})";
                         }
 
                         //Check if Statistical Sample
@@ -264,12 +272,19 @@ namespace Customization.Tasks
         /// <param name="rows"></param>
         private void UpdateTestDisplayText(IEnumerable<UnboundGridRow> rows)
         {
-            foreach (var row in rows)
+            try
             {
-                if (row.Tag is Sample sample)
+                foreach (var row in rows)
                 {
-                    UpdateTestDisplayTextBySample(sample);
+                    if (row.Tag is Sample sample)
+                    {
+                        UpdateTestDisplayTextBySample(sample);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
             }
         }
 
@@ -280,7 +295,9 @@ namespace Customization.Tasks
         /// <returns></returns>
         private void GetTestData(Sample sample, SimpleTreeListNodeProxy node)
         {
-            var tests = sample.Tests?.ActiveItems.Cast<Test>().Where(x => x.Assign).Select(x => x);
+            var tests = sample.Tests?.ActiveItems.Cast<Test>()
+                .Where(x => x.Assign && (x.Status.PhraseId is PhraseTestStat.PhraseIdV or PhraseTestStat.PhraseIdW or PhraseTestStat.PhraseIdP))
+                .Select(x => x);
             var removedTests = sample.Tests?.ActiveItems.Cast<Test>().Where(x => x.Assign == false).Select(x => x);
 
             RemoveTestNodes(removedTests);
@@ -338,7 +355,7 @@ namespace Customization.Tasks
             try
             {
                 var geometry = ftiCreateReplicate ? componentList?.FtiSampleForm?.PhraseText : string.Empty;
-                var displayText = $"{test.AnalysisTestNumber} {componentList?.FtiNorm?.FtiNormName} {geometry.Trim()}";
+                var displayText = $"{test.AnalysisTestNumber} {componentList?.FtiNorm?.FtiNormName} {geometry?.Trim()}";
 
                 Logger.Error(displayText);
                 return displayText;
@@ -387,17 +404,16 @@ namespace Customization.Tasks
             {
                 foreach (var test in tests)
                 {
-
-                    //check is test exists in testPropertyGrid, in which case it hasn't been updated on the test yet
+                    //check if test exists in testPropertyGrid, in which case it hasn't been updated on the test yet if it was just created
                     var testRow = _testPropertyGrid.Rows.Where(x => x.Tag == test).FirstOrDefault();
 
                     string testDisplayText = string.Empty;
-                    if (test.IsNew() == false)
-                    {
-                        UpdateTestDisplayTextByTestRow(testRow);
-                    }
 
-                    if (testRow is null || isStartup)
+                    if (test.IsNew() == false && (LaunchMode == "MODIFY" || LaunchMode == "DISPLAY") && isStartup == false)
+                    {
+                        testDisplayText = GetTestDisplayText(test, test.ComponentListEntity, test.FtiCreateReplicate);
+                    }
+                    else if (testRow is null || isStartup)
                     {
                         testDisplayText = GetTestDisplayText(test, test.ComponentListEntity, test.FtiCreateReplicate);
                     }
@@ -433,7 +449,6 @@ namespace Customization.Tasks
                 }
             }
         }
-
         /// <summary>
         /// Event Handler for Tree List Node addition
         /// </summary>
@@ -445,6 +460,7 @@ namespace Customization.Tasks
             {
                 //TODO - If test is on selected sample. it will not render.
                 var gridSample = _samplePropertyGrid.Rows.Where(x => x.Tag == sample).FirstOrDefault();
+
                 if (gridSample is not null)
                 {
                     UpdateSampleDisplayTextByRow(gridSample);
