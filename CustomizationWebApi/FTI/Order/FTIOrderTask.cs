@@ -12,7 +12,7 @@ namespace CustomizationWebApi.FTI
     /// <seealso cref="SampleManagerWebApiTask" />
     [SampleManagerWebApi("orderDetail")]
     [OpenApiBasePath("/")]
-    public class FTIOrderManagement : SampleManagerWebApiTask
+    public class FTIOrderTask : SampleManagerWebApiTask
     {
         #region Endpoints
         [WebInvoke(UriTemplate = "fti/OrderDetail", Method = "POST")]

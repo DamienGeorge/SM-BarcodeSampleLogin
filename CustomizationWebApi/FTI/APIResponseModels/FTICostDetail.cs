@@ -2,6 +2,7 @@
 
 namespace CustomizationWebApi.FTI.APIRequests
 {
+    [DataContract(Name = "costDetail")]
     public class FTICostDetail
     {
         /// <summary>

@@ -1,52 +1,41 @@
-﻿using Thermo.SampleManager.Library;
-using CoreWCF.Web;
-using CoreWCF.OpenApi.Attributes;
-using CustomizationWebApi.FTI.APIRequests;
-using CustomizationWebApi.Client;
-using CustomizationWebApi.Client.Cost;
-using Thermo.SampleManager.Library.EntityDefinition;
+﻿using CustomizationWebApi.Client.Cost;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Thermo.Framework.Core;
 using Thermo.SampleManager.Common.Data;
+using Thermo.SampleManager.Library.EntityDefinition;
 using Thermo.SampleManager.Server;
 
-namespace CustomizationWebApi.FTI.Cost
+namespace CustomizationWebApi
 {
-    /// <summary>
-    /// FTI Web Api Task
-    /// </summary>
-    /// <seealso cref="SampleManagerWebApiTask" />
-    [SampleManagerWebApi("CostDetail")]
-    [OpenApiBasePath("/")]
-    public class FTICostManagement : SampleManagerWebApiTask
+    public class FTICostManagement
     {
-        #region Endpoints
-        [WebInvoke(UriTemplate = "fti/CostDetail", Method = "POST")]
-        [OpenApiOperation(Description = "Receives data regarding CostDetails")]
-        [OpenApiTag("FTI")]
-        public bool FetchCostDetails(FTICostDetail fTICostDetail)
+        #region Properties
+        public IEntityManager EntityManager { get; }
+        public Logger Logger { get; }
+        #endregion
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="entityManager"></param>
+        /// <param name="logger"></param>
+        public FTICostManagement(IEntityManager entityManager, Logger logger)
         {
-            try
-            {
-                Logger.Info($"Starting CostDetails for order number: {fTICostDetail.PlantID}");
-
-                if (string.IsNullOrEmpty(fTICostDetail.PlantID))
-                {
-                    Logger.Error("Plant ID is null or empty");
-                    throw new ArgumentException("Plant ID cannot be null or empty", nameof(fTICostDetail));
-                }
-
-                ProcessSoapClient(fTICostDetail.PlantID).Wait();
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Error in FetchOrderDetails: {ex.Message}");
-                Logger.Error($"Stack trace: {ex.StackTrace}");
-                throw;
-            }
+            EntityManager = entityManager;
+            Logger = logger;
         }
 
-        private async Task ProcessSoapClient(string orderNumber)
+        /// <summary>
+        /// Process Cost Soap Client
+        /// </summary>
+        /// <param name="orderNumber"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public async Task ProcessSoapClient(string orderNumber)
         {
             zLIMS_ACT_COSTS_GETClient client = new();
 
@@ -182,6 +171,5 @@ namespace CustomizationWebApi.FTI.Cost
 
             EntityManager.Transaction.Add(rateEntry);
         }
-        #endregion
     }
 }
