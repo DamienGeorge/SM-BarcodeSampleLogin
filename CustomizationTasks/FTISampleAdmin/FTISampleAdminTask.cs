@@ -38,8 +38,7 @@ namespace Customization.Tasks
         {
             if (templateProperty.PropertyName == TestPropertyNames.FtiAnalysisMethod)
             {
-                EntityBrowse methodBrowse = base.BrowseFactory.CreateEntityBrowse(test.Analysis.FtiAnalysisMethods);
-                methodBrowse.ReturnProperty = FtiAnalysisMethodPropertyNames.MethodName;
+                EntityBrowse methodBrowse = BrowseFactory.CreateEntityBrowse(test.Analysis.FtiAnalysisMethods);
                 column.SetCellBrowse(row, methodBrowse);
             }
         }

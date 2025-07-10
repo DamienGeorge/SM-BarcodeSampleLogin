@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Text.Json.Nodes;
+using System.Xml;
 using Thermo.Framework.Core;
 using Thermo.SampleManager.Common.Data;
 using Thermo.SampleManager.Library.ClientControls;
@@ -10,7 +13,9 @@ using Thermo.SampleManager.Library.EntityDefinition;
 using Thermo.SampleManager.Library.FormDefinition;
 using Thermo.SampleManager.ObjectModel;
 using Thermo.SampleManager.Server;
+using Thermo.SampleManager.Server.Workflow;
 using Thermo.SampleManager.Server.Workflow.Nodes;
+using static Thermo.SampleManager.Server.LabelExportHTML;
 
 namespace Customization.Tasks
 {
@@ -24,6 +29,9 @@ namespace Customization.Tasks
         private const string StorageStatisticalSampleEn = "Storage in";
         private const string StorageStatisticalSampleGr = "Lagerung in ";
         private const string StatisticalSampleEntityId = "FTI_AVG";
+        private readonly int SampleAttachmentMasterMenuNumber = 35224;
+        private readonly int JobAttachmentMasterMenuNumber = 35225;
+        private readonly int TestAttachmentMasterMenuNumber = 35226;
         #endregion
 
         SimpleTreeList _treeList;
@@ -40,6 +48,12 @@ namespace Customization.Tasks
         public string LaunchMode { get; }
 
         public bool isStartup = false;
+        private IEntity currentEntity;
+        private ContextMenuItem reportMenu;
+        private ContextMenuItem labelMenu;
+        private string jobActionName = "FTI_PRINT_SAMP_LBLS";
+        private string sampleActionName = "FTI_LBL_REP";
+        private readonly ICollection<ReportTemplateMenuInfo> jobReportTemplates;
 
         public FTISampleAdminBaseTask(FormSampleAdmin MainForm, StandardLibrary library, Logger logger, IEntityManager entityManager, string launchMode)
         {
@@ -55,14 +69,214 @@ namespace Customization.Tasks
             _treeList.NodeAdded += TreeListItems_NodeAdded;
 
             _testAssignmentGrid.CellValueChanged += TestAssignmentGrid_CellValueChanged;
-            _testAssignmentGrid.RowAdded += _testAssignmentGrid_RowAdded;
-            _testAssignmentGrid.ColumnAdded += _testAssignmentGrid_ColumnAdded;
+            //_testAssignmentGrid.RowAdded += _testAssignmentGrid_RowAdded;
+            //_testAssignmentGrid.ColumnAdded += _testAssignmentGrid_ColumnAdded;
             language = ((Personnel)library.Environment.CurrentUser).Language.Identity;
             this.MainForm = MainForm;
             Library = library;
             Logger = logger;
             EntityManager = entityManager;
             LaunchMode = launchMode;
+
+            //TODO - check if can be edited
+            var attachmentMenu = _treeList.ContextMenu.AddItem("Edit Attachment(s)", "NOTE_EDIT");
+            attachmentMenu.ItemClicked += AttachmentMenu_ItemClicked;
+
+            _treeList.ContextMenu.BeforePopup += ContextMenu_BeforePopup;
+
+            reportMenu = _treeList.ContextMenu.AddItem("Reports", "NOTE_EDIT", true);
+
+            jobReportTemplates = GetReportTemplates(TableNames.JobHeader);
+
+            foreach (var reportTemplate in jobReportTemplates)
+            {
+                var reportHandler = reportMenu.CustomItems.Add(reportTemplate.Name, null);
+                reportHandler.ItemClicked += ReportMenu_ItemClicked;
+            }
+
+            reportMenu.BeginGroup = false;
+
+            labelMenu = _treeList.ContextMenu.AddItem("Print Sample Label(s)", null);
+            labelMenu.ItemClicked += LabelMenu_ItemClicked;
+
+        }
+
+        /// <summary>
+        /// Handles the Label Menu Item Click Event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LabelMenu_ItemClicked(object sender, ContextMenuItemEventArgs e)
+        {
+            if (currentEntity is not null)
+            {
+                var workflowBag = new WorkflowPropertyBag();
+                try
+                {
+                    WorkflowActionType actionType;
+                    if (currentEntity is Sample sample)
+                    {
+                        actionType = EntityManager.Select<WorkflowActionType>(new Identity(currentEntity.EntityType, sampleActionName));
+                    }
+                    else
+                    {
+                        actionType = EntityManager.Select<WorkflowActionType>(new Identity(currentEntity.EntityType, jobActionName));
+                    }
+
+                    Library.Utils.SetStatusBar("Generating Label");
+                    currentEntity.PerformAction(actionType.Identity, workflowBag);
+
+                    if (workflowBag.HasErrors)
+                    {
+                        foreach (var entry in workflowBag.Errors)
+                        {
+                            Logger.Error(entry);
+                        }
+                        Library.Utils.SetStatusBar("Errors faced during Label Generation. Check Log for errors");
+                    }
+                    Library.Utils.SetStatusBar("Label Generated");
+                }
+                catch (Exception ex)
+                {
+                    Library.Utils.SetStatusBar("Errors faced during Label Generation. Check Log for errors");
+                    Logger.Error(ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the Report Menu Item Click Event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ReportMenu_ItemClicked(object sender, ContextMenuItemEventArgs e)
+        {
+            if (currentEntity is JobHeader job)
+            {
+                try
+                {
+                    ReportTemplateMenuInfo selectedReport = jobReportTemplates.Where(x => x.Name == e.Item.Caption).FirstOrDefault();
+
+                    Library.Utils.SetStatusBar("Generating Report");
+                    Library.Reporting.PreviewReport(selectedReport.Identity, currentEntity, new ReportOptions(ReportOutput.Preview));
+                    Library.Utils.SetStatusBar("Report Generated");
+                }
+                catch (Exception ex)
+                {
+                    Library.Utils.SetStatusBar("Errors faced during Report Generation. Check Log for errors");
+                    Logger.Error(ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get Matching Report Templates for a table
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        private ICollection<ReportTemplateMenuInfo> GetReportTemplates(string tableName)
+        {
+            List<ReportTemplateMenuInfo> reportTemplates = new List<ReportTemplateMenuInfo>();
+            IQuery query = EntityManager.CreateQuery("REPORT_TEMPLATE");
+            query.AddEquals("DATA_ENTITY_DEFINITION", tableName);
+            query.AddEquals("REMOVEFLAG", false);
+            query.AddEquals("PUBLISH", true);
+            query.AddEquals("ACTIVE", true);
+            query.AddEquals("APPROVAL_STATUS", "A");
+
+            foreach (IEntity entity in EntityManager.Select("REPORT_TEMPLATE", query, true))
+            {
+                reportTemplates.Add(new ReportTemplateMenuInfo()
+                {
+                    Identity = entity.GetString("IDENTITY"),
+                    Name = entity.GetString("NAME"),
+                    Version = entity.GetString("VERSION"),
+                    Icon = ""
+                });
+            }
+            return reportTemplates;
+        }
+
+        /// <summary>
+        /// Entity is only fetched during before popup. So set entity here
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ContextMenu_BeforePopup(object sender, ContextMenuBeforePopupEventArgs e)
+        {
+            var entity = e.Entity;
+
+            if (entity is not null)
+            {
+                currentEntity = entity;
+
+                if (currentEntity is JobHeader job)
+                {
+                    reportMenu.Visible = true;
+                    foreach (ContextMenuItem entry in reportMenu.CustomItems)
+                    {
+                        entry.Visible = true;
+                    }
+                }
+                else
+                {
+                    reportMenu.Visible = false;
+                    foreach (ContextMenuItem entry in reportMenu.CustomItems)
+                    {
+                        entry.Visible = false;
+                    }
+                }
+
+                if (currentEntity is Test test)
+                {
+                    labelMenu.Visible = false;
+                }
+                else
+                {
+                    labelMenu.Visible = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Defines what should happen after the edit attachments button is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AttachmentMenu_ItemClicked(object sender, ContextMenuItemEventArgs e)
+        {
+            if (currentEntity is not null)
+            {
+                try
+                {
+                    int masterMenuToRun = 0;
+
+                    currentEntity.LockRelease();
+                    MainForm.SetBusy();
+
+                    if (currentEntity is JobHeader job)
+                    {
+                        masterMenuToRun = JobAttachmentMasterMenuNumber;
+                    }
+                    else if (currentEntity is Sample sample)
+                    {
+                        masterMenuToRun = SampleAttachmentMasterMenuNumber;
+                    }
+                    else if (currentEntity is Test test)
+                    {
+                        masterMenuToRun = TestAttachmentMasterMenuNumber;
+                    }
+
+                    Library.Task.CreateTaskAndWait(masterMenuToRun, currentEntity);
+                    currentEntity.Lock();
+                    MainForm.ClearBusy();
+                }
+                catch (Exception ex)
+                {
+                    MainForm.ForceClearBusy();
+                }
+
+            }
         }
 
         /// <summary>
@@ -117,30 +331,30 @@ namespace Customization.Tasks
             UpdateTestDisplayTextByTestRow(e.Row);
         }
 
-        /// <summary>
-        /// Handles the column added event on the TestAssignmentGrid
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void _testAssignmentGrid_ColumnAdded(object sender, UnboundGridColumnEventArgs e)
-        {
-            var rows = (sender as UnboundGrid).Rows.Distinct();
+        ///// <summary>
+        ///// Handles the column added event on the TestAssignmentGrid
+        ///// </summary>
+        ///// <param name="sender"></param>
+        ///// <param name="e"></param>
+        //private void _testAssignmentGrid_ColumnAdded(object sender, UnboundGridColumnEventArgs e)
+        //{
+        //    var rows = (sender as UnboundGrid).Rows.Distinct();
 
-            UpdateTestDisplayText(rows);
-        }
+        //    UpdateTestDisplayText(rows);
+        //}
 
 
-        /// <summary>
-        /// Handles the row added event on the TestAssignmentGrid
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void _testAssignmentGrid_RowAdded(object sender, UnboundGridRowAddedEventArgs e)
-        {
-            var rows = (sender as UnboundGrid).Rows.Distinct();
+        ///// <summary>
+        ///// Handles the row added event on the TestAssignmentGrid
+        ///// </summary>
+        ///// <param name="sender"></param>
+        ///// <param name="e"></param>
+        //private void _testAssignmentGrid_RowAdded(object sender, UnboundGridRowAddedEventArgs e)
+        //{
+        //    var rows = (sender as UnboundGrid).Rows.Distinct();
 
-            UpdateTestDisplayText(rows);
-        }
+        //    UpdateTestDisplayText(rows);
+        //}
 
 
         /// <summary>
@@ -150,10 +364,47 @@ namespace Customization.Tasks
         /// <param name="e"></param>
         private void TestAssignmentGrid_CellValueChanged(object sender, UnboundGridValueChangedEventArgs e)
         {
-            var rows = (sender as UnboundGrid).Rows.Where(x => x.Tag == e.Row.Tag).Distinct();
+            if (e.Row.Tag is Sample sample)
+            {
+                try
+                {
+                    var columnTag = (e.Column.Tag as object[]);
+                    var analysis = columnTag[0];
+                    int.TryParse(columnTag[1].ToString(), out int analysisNumber);
 
-            UpdateTestDisplayText(rows);
+                    var test = sample.Tests.ActiveItems.Cast<Test>().Where(x => analysisNumber == 1 ? x.Analysis == analysis : x.AnalysisTestNumber == e.Column.Caption)
+                        .FirstOrDefault();
+
+                    //If current test assignment sample is in focus, the test property grid will likely be loaded.
+                    if (test.Assign)
+                    {
+                        var displayText = string.Empty;
+
+                        var unboundGridRow = _testPropertyGrid.Rows?.Where(x => x.Tag == test).FirstOrDefault();
+
+                        if (_treeList.FocusedNode.Data == sample && unboundGridRow != null)
+                        {
+                            displayText = GetTestDisplayText(unboundGridRow, test);
+                        }
+                        else
+                        {
+                            displayText = GetTestDisplayText(test, test.ComponentListEntity, test.FtiCreateReplicate);
+                        }
+                        _treeList.AddNode(_treeList.FindNodeByData(sample), displayText, new IconName(test.Status?.Icon?.Name), test);
+
+                    }
+                    else
+                    {
+                        RemoveTestNode(test);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex);
+                }
+            }
         }
+
 
         /// <summary>
         /// Update the Sample Display Text using the data from the SampleGrid Row 
@@ -180,7 +431,7 @@ namespace Customization.Tasks
                         if (sample.SampleType.PhraseId == PhraseSampType.PhraseIdMATERIAL)
                         {
                             var phraseText = string.Empty;
-                            
+
                             try
                             {
                                 phraseText = (EntityManager.SelectPhrase(PhraseFtiMatype.Identity, row.GetValue(SamplePropertyNames.FtiMaterialType).ToString()) as Phrase).PhraseText;
@@ -296,7 +547,7 @@ namespace Customization.Tasks
         private void GetTestData(Sample sample, SimpleTreeListNodeProxy node)
         {
             var tests = sample.Tests?.ActiveItems.Cast<Test>()
-                .Where(x => x.Assign && (x.Status.PhraseId is PhraseTestStat.PhraseIdV or PhraseTestStat.PhraseIdW or PhraseTestStat.PhraseIdP))
+                .Where(x => x.Assign && (x.IsNew() || x.Status.PhraseId is not PhraseTestStat.PhraseIdX)) //Exclude Cancelled Tests
                 .Select(x => x);
             var removedTests = sample.Tests?.ActiveItems.Cast<Test>().Where(x => x.Assign == false).Select(x => x);
 
@@ -311,27 +562,17 @@ namespace Customization.Tasks
 
             if (testRow.Tag is Test test)
             {
-                var testNode = _treeList.FindNode(test);
-
-                bool.TryParse(testRow.GetValue(TestPropertyNames.FtiCreateReplicate)?.ToString(), out bool createReplicate);
-
-                var componentListString = testRow.GetValue(TestPropertyNames.ComponentList);
-
-                if (componentListString != null)
+                if (isAssigned)
                 {
-                    var componentList = EntityManager.Select<VersionedCLHeader>(new Identity(test.Analysis.Identity, test.Analysis.AnalysisVersion, componentListString));
-
-                    Logger.Error($"Component List {componentList?.CompList}");
-                    Logger.Error($"Create Replicate {createReplicate}");
-
-                    var displayText = GetTestDisplayText(test, componentList, createReplicate);
+                    var testNode = _treeList.FindNode(test);
+                    var displayText = GetTestDisplayText(testRow, test);
 
                     if (testNode == null)
                     {
                         Logger.Error($"Did not find Test node");
                         var sampleNode = _treeList.FindNode(test.Sample);
                         //Add test node if it hasn't been created yet
-                        _treeList.AddNode(sampleNode, displayText, new IconName("INT_TEST_V"), test);
+                        _treeList.AddNode(sampleNode, displayText, new IconName(test.Status?.Icon?.Name), test);
                     }
                     else
                     {
@@ -340,7 +581,30 @@ namespace Customization.Tasks
                         testNode.DisplayText = displayText;
                     }
                 }
+                else
+                {  //If a test is unassigned, then it needs to be removed
+                    RemoveTestNode(test);
+                }
             }
+        }
+
+        private string GetTestDisplayText(UnboundGridRow testRow, Test test)
+        {
+            bool.TryParse(testRow.GetValue(TestPropertyNames.FtiCreateReplicate)?.ToString(), out bool createReplicate);
+
+            var componentListString = testRow.GetValue(TestPropertyNames.ComponentList);
+
+            if (componentListString != null)
+            {
+                var componentList = EntityManager.Select<VersionedCLHeader>(new Identity(test.Analysis.Identity, test.Analysis.AnalysisVersion, componentListString));
+
+                Logger.Error($"Component List {componentList?.CompList}");
+                Logger.Error($"Create Replicate {createReplicate}");
+
+                return GetTestDisplayText(test, componentList, createReplicate);
+            }
+
+            return string.Empty;
         }
 
         /// <summary>
@@ -409,6 +673,10 @@ namespace Customization.Tasks
 
                     string testDisplayText = string.Empty;
 
+                    //When creating new sample - test created - not showing in navigation, will show if test property grid is upddated
+                    //Will not show if updating assignment grid
+                    //Test is removed but not added correctly
+
                     if (test.IsNew() == false && (LaunchMode == "MODIFY" || LaunchMode == "DISPLAY") && isStartup == false)
                     {
                         testDisplayText = GetTestDisplayText(test, test.ComponentListEntity, test.FtiCreateReplicate);
@@ -419,13 +687,13 @@ namespace Customization.Tasks
                     }
                     else
                     {
-                        UpdateTestDisplayTextByTestRow(testRow);
+                        testDisplayText = GetTestDisplayText(testRow, test);
                     }
 
                     var testNode = _treeList.FindNode(test);
                     if (testNode == null)
                     {
-                        _treeList.AddNode(node, testDisplayText, new IconName("INT_TEST_V"), test);
+                        _treeList.AddNode(node, testDisplayText, new IconName(test.Status?.Icon?.Name), test);
                     }
                     else
                     {

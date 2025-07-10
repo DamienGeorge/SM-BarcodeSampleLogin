@@ -11,12 +11,12 @@ using Thermo.SampleManager.Library.EntityDefinition;
 
 namespace Thermo.SampleManager.ObjectModel
 {
-	/// <summary>
-	/// Defines extended business logic and manages access to the HAZARD entity.
-	/// </summary> 
-	[SampleManagerEntity(EntityName)]
-	public class FtiAnalystNotebookPage : AnalystNotebookPage
-	{
+    /// <summary>
+    /// Defines extended business logic and manages access to the HAZARD entity.
+    /// </summary> 
+    [SampleManagerEntity(EntityName)]
+    public class FtiAnalystNotebookPage : AnalystNotebookPage
+    {
         [PromptByteArray]
         [ExplorerIgnore]
         public byte[] FtiPageAsPdfReport
@@ -39,7 +39,7 @@ namespace Thermo.SampleManager.ObjectModel
                 }
             }
         }
-        public static byte[] FtiGetRichtTextAsPdf(byte[] openXmlBytes)
+        public byte[] FtiGetRichtTextAsPdf(byte[] openXmlBytes)
         {
             try
             {
@@ -52,7 +52,11 @@ namespace Thermo.SampleManager.ObjectModel
                     section.Margins.Right = 26;
                     section.Margins.Top = 0;
                     section.Margins.Bottom = 0;
+
+                    section.Page.Width = Library.Environment.GetGlobalInt("FTI_CERT_NOTEBOOK_PAGE_WIDTH");
+                    section.Page.Height = Library.Environment.GetGlobalInt("FTI_CERT_NOTEBOOK_PAGE_HEIGHT");
                 }
+
 
                 string text = Path.GetTempFileName() + ".pdf";
 
@@ -71,7 +75,7 @@ namespace Thermo.SampleManager.ObjectModel
             }
         }
 
-        public static byte[] FtiGetSpreadSheetDocumentAsPdf(byte[] openXmlBytes)
+        public byte[] FtiGetSpreadSheetDocumentAsPdf(byte[] openXmlBytes)
         {
             try
             {
@@ -84,6 +88,8 @@ namespace Thermo.SampleManager.ObjectModel
                     worksheet.ActiveView.Margins.Right = 26;
                     worksheet.ActiveView.Margins.Top = 0;
                     worksheet.ActiveView.Margins.Bottom = 0;
+
+                    worksheet.ActiveView.SetCustomPaperSize(Library.Environment.GetGlobalInt("FTI_CERT_NOTEBOOK_PAGE_WIDTH"), Library.Environment.GetGlobalInt("FTI_CERT_NOTEBOOK_PAGE_HEIGHT"));
                 }
 
                 string text = Path.GetTempFileName() + ".pdf";

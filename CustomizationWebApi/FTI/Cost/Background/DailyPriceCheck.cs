@@ -6,7 +6,6 @@ namespace CustomizationWebApi
     /// <summary>
     /// Background task for pulling the SAP cost date into SM
     /// </summary>
-    //Todo - test this
     [SampleManagerTask(nameof(PriceCheck))]
     public class PriceCheck : SampleManagerTask, IBackgroundTask
     {
@@ -24,14 +23,6 @@ namespace CustomizationWebApi
             {
                 Logger.Error(ex);
             }
-        }
-
-        protected override void SetupTask()
-        {
-            base.SetupTask();
-
-            PlantID = 1029;
-            Launch();
         }
     }
 }
