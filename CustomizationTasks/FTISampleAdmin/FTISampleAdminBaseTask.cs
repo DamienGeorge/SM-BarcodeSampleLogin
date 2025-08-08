@@ -15,6 +15,7 @@ using Thermo.SampleManager.ObjectModel;
 using Thermo.SampleManager.Server;
 using Thermo.SampleManager.Server.Workflow;
 using Thermo.SampleManager.Server.Workflow.Nodes;
+using static System.Net.Mime.MediaTypeNames;
 using static Thermo.SampleManager.Server.LabelExportHTML;
 
 namespace Customization.Tasks
@@ -29,9 +30,15 @@ namespace Customization.Tasks
         private const string StorageStatisticalSampleEn = "Storage in";
         private const string StorageStatisticalSampleGr = "Lagerung in ";
         private const string StatisticalSampleEntityId = "FTI_AVG";
+        private const string NoteIconName = "NOTE_EDIT";
+        private const string CancelTestIconName = "INT_TEST_X";
+        private const string jobActionName = "FTI_PRINT_SAMP_LBLS";
+        private const string sampleActionName = "FTI_LBL_REP";
+
         private readonly int SampleAttachmentMasterMenuNumber = 35224;
         private readonly int JobAttachmentMasterMenuNumber = 35225;
         private readonly int TestAttachmentMasterMenuNumber = 35226;
+        private readonly int testCancelMasterMenu = 11019;
         #endregion
 
         SimpleTreeList _treeList;
@@ -51,8 +58,7 @@ namespace Customization.Tasks
         private IEntity currentEntity;
         private ContextMenuItem reportMenu;
         private ContextMenuItem labelMenu;
-        private string jobActionName = "FTI_PRINT_SAMP_LBLS";
-        private string sampleActionName = "FTI_LBL_REP";
+        private ContextMenuItem cancelTestMenu;
         private readonly ICollection<ReportTemplateMenuInfo> jobReportTemplates;
 
         public FTISampleAdminBaseTask(FormSampleAdmin MainForm, StandardLibrary library, Logger logger, IEntityManager entityManager, string launchMode)
@@ -78,8 +84,8 @@ namespace Customization.Tasks
             EntityManager = entityManager;
             LaunchMode = launchMode;
 
-            //TODO - check if can be edited
-            var attachmentMenu = _treeList.ContextMenu.AddItem("Edit Attachment(s)", "NOTE_EDIT");
+            #region Custom RMBs
+            var attachmentMenu = _treeList.ContextMenu.AddItem("Edit Attachment(s)", NoteIconName);
             attachmentMenu.ItemClicked += AttachmentMenu_ItemClicked;
 
             _treeList.ContextMenu.BeforePopup += ContextMenu_BeforePopup;
@@ -99,6 +105,93 @@ namespace Customization.Tasks
             labelMenu = _treeList.ContextMenu.AddItem("Print Sample Label(s)", null);
             labelMenu.ItemClicked += LabelMenu_ItemClicked;
 
+            cancelTestMenu = _treeList.ContextMenu.AddItem("Cancel Test", CancelTestIconName);
+            cancelTestMenu.ItemClicked += CancelTestMenu_ItemClicked;
+            #endregion
+        }
+
+        /// <summary>
+        /// Entity is only fetched during before popup. So set entity here
+        /// Also set any visibility on the menu for different Context Menu items
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ContextMenu_BeforePopup(object sender, ContextMenuBeforePopupEventArgs e)
+        {
+            var entity = e.Entity;
+
+            if (entity is not null)
+            {
+                currentEntity = entity;
+
+                if (currentEntity is JobHeader job)
+                {
+                    reportMenu.Visible = true;
+                    foreach (ContextMenuItem entry in reportMenu.CustomItems)
+                    {
+                        entry.Visible = true;
+                    }
+                }
+                else
+                {
+                    reportMenu.Visible = false;
+                    foreach (ContextMenuItem entry in reportMenu.CustomItems)
+                    {
+                        entry.Visible = false;
+                    }
+                }
+
+                if (currentEntity is Test test)
+                {
+                    labelMenu.Visible = false;
+                    cancelTestMenu.Visible = true;
+                }
+                else
+                {
+                    labelMenu.Visible = true;
+                    cancelTestMenu.Visible = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the Cancel Test Click Event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CancelTestMenu_ItemClicked(object sender, ContextMenuItemEventArgs e)
+        {
+            if (currentEntity is not null && currentEntity is Test test)
+            {
+                try
+                {
+                    currentEntity.LockRelease();
+                    MainForm.SetBusy();
+
+                    var result = Library.Task.CreateTaskAndWait(testCancelMasterMenu, null, new EntityCollection() { test });
+
+                    MainForm.ClearBusy();
+                    currentEntity.Lock();
+                    RemoveTest(test);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex);
+                    MainForm.ForceClearBusy();
+                    currentEntity.Lock();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Update test icon
+        /// </summary>
+        /// <param name="test"></param>
+        private void RemoveTest(Test test)
+        {
+            var testNode = _treeList.FindNode(test);
+
+            _treeList.RemoveNode(testNode);
         }
 
         /// <summary>
@@ -198,47 +291,6 @@ namespace Customization.Tasks
         }
 
         /// <summary>
-        /// Entity is only fetched during before popup. So set entity here
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ContextMenu_BeforePopup(object sender, ContextMenuBeforePopupEventArgs e)
-        {
-            var entity = e.Entity;
-
-            if (entity is not null)
-            {
-                currentEntity = entity;
-
-                if (currentEntity is JobHeader job)
-                {
-                    reportMenu.Visible = true;
-                    foreach (ContextMenuItem entry in reportMenu.CustomItems)
-                    {
-                        entry.Visible = true;
-                    }
-                }
-                else
-                {
-                    reportMenu.Visible = false;
-                    foreach (ContextMenuItem entry in reportMenu.CustomItems)
-                    {
-                        entry.Visible = false;
-                    }
-                }
-
-                if (currentEntity is Test test)
-                {
-                    labelMenu.Visible = false;
-                }
-                else
-                {
-                    labelMenu.Visible = true;
-                }
-            }
-        }
-
-        /// <summary>
         /// Defines what should happen after the edit attachments button is clicked
         /// </summary>
         /// <param name="sender"></param>
@@ -267,13 +319,15 @@ namespace Customization.Tasks
                         masterMenuToRun = TestAttachmentMasterMenuNumber;
                     }
 
-                    Library.Task.CreateTaskAndWait(masterMenuToRun, currentEntity);
+                    var result = Library.Task.CreateTaskAndWait(masterMenuToRun, null, new EntityCollection() { currentEntity });
+
                     currentEntity.Lock();
                     MainForm.ClearBusy();
                 }
                 catch (Exception ex)
                 {
                     MainForm.ForceClearBusy();
+                    Logger.Error(ex);
                 }
 
             }
@@ -331,32 +385,6 @@ namespace Customization.Tasks
             UpdateTestDisplayTextByTestRow(e.Row);
         }
 
-        ///// <summary>
-        ///// Handles the column added event on the TestAssignmentGrid
-        ///// </summary>
-        ///// <param name="sender"></param>
-        ///// <param name="e"></param>
-        //private void _testAssignmentGrid_ColumnAdded(object sender, UnboundGridColumnEventArgs e)
-        //{
-        //    var rows = (sender as UnboundGrid).Rows.Distinct();
-
-        //    UpdateTestDisplayText(rows);
-        //}
-
-
-        ///// <summary>
-        ///// Handles the row added event on the TestAssignmentGrid
-        ///// </summary>
-        ///// <param name="sender"></param>
-        ///// <param name="e"></param>
-        //private void _testAssignmentGrid_RowAdded(object sender, UnboundGridRowAddedEventArgs e)
-        //{
-        //    var rows = (sender as UnboundGrid).Rows.Distinct();
-
-        //    UpdateTestDisplayText(rows);
-        //}
-
-
         /// <summary>
         /// Handles the cell value changed event on the TestAssignmentGrid
         /// </summary>
@@ -390,7 +418,7 @@ namespace Customization.Tasks
                         {
                             displayText = GetTestDisplayText(test, test.ComponentListEntity, test.FtiCreateReplicate);
                         }
-                        _treeList.AddNode(_treeList.FindNodeByData(sample), displayText, new IconName(test.Status?.Icon?.Name), test);
+                        _treeList.AddNode(_treeList.FindNodeByData(sample), displayText, GetTestIcon(test), test);
 
                     }
                     else
@@ -516,29 +544,6 @@ namespace Customization.Tasks
             }
         }
 
-
-        /// <summary>
-        /// Update Display Text on the test
-        /// </summary>
-        /// <param name="rows"></param>
-        private void UpdateTestDisplayText(IEnumerable<UnboundGridRow> rows)
-        {
-            try
-            {
-                foreach (var row in rows)
-                {
-                    if (row.Tag is Sample sample)
-                    {
-                        UpdateTestDisplayTextBySample(sample);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex);
-            }
-        }
-
         /// <summary>
         /// Get the tests on the sample
         /// </summary>
@@ -572,7 +577,7 @@ namespace Customization.Tasks
                         Logger.Error($"Did not find Test node");
                         var sampleNode = _treeList.FindNode(test.Sample);
                         //Add test node if it hasn't been created yet
-                        _treeList.AddNode(sampleNode, displayText, new IconName(test.Status?.Icon?.Name), test);
+                        _treeList.AddNode(sampleNode, displayText, GetTestIcon(test), test);
                     }
                     else
                     {
@@ -693,13 +698,25 @@ namespace Customization.Tasks
                     var testNode = _treeList.FindNode(test);
                     if (testNode == null)
                     {
-                        _treeList.AddNode(node, testDisplayText, new IconName(test.Status?.Icon?.Name), test);
+                        _treeList.AddNode(node, testDisplayText, GetTestIcon(test), test);
                     }
                     else
                     {
                         testNode.DisplayText = testDisplayText;
                     }
                 }
+            }
+        }
+        private IconName GetTestIcon(Test test)
+        {
+            if (test.Status is not null && test.Status.Icon is not null)
+            {
+                return new IconName(test.Status.Icon?.Identity);
+            }
+            else
+            {
+                PhraseBase phrase = EntityManager.SelectPhrase(PhraseTestStat.Identity, PhraseTestStat.PhraseIdV) as PhraseBase;
+                return new IconName(phrase?.Icon?.Identity);
             }
         }
 
