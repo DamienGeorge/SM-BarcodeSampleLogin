@@ -15,6 +15,7 @@ namespace CustomizationWebApi.FTI
         private string _subscriptionUrl;
         private TokenService _tokenService;
 
+        //TODO - add all endpoints using a phrase list?
         private string orderDetailsEndPoint = "fti/OrderDetail";
 
         [CommandLineSwitch("subscription", "The name of the subscription to create")]
@@ -106,38 +107,6 @@ namespace CustomizationWebApi.FTI
                 throw;
             }
         }
-
-        //public async Task HandleWebhookEventAsync(HttpRequest request)
-        //{
-        //    using var reader = new StreamReader(request.Body);
-        //    var cloudEventJson = await reader.ReadToEndAsync();
-
-        //    // Parse and validate the cloud event
-        //    var cloudEvent = System.Text.Json.JsonSerializer.Deserialize<CloudEvent>(cloudEventJson);
-
-        //    // Process the cloud event based on its type
-        //    switch (cloudEvent.Type)
-        //    {
-        //        case "your.event.type":
-        //            await ProcessEventAsync(cloudEvent);
-        //            break;
-        //        default:
-        //            throw new NotSupportedException($"Event type {cloudEvent.Type} is not supported");
-        //    }
-        //}
-
-        //private async Task ProcessEventAsync(CloudEvent cloudEvent)
-        //{
-        //    ZLIMS_BAPI_ALM_ORD_GET_DETAILClient client = new();
-
-        //    BAPI_ALM_ORDER_GET_DETAIL request = new BAPI_ALM_ORDER_GET_DETAIL
-        //    {
-        //        NUMBER = cloudEvent.Data.NUMBER,
-        //        RETURN = new List<BAPIRET2>().ToArray()
-        //    };
-
-        //    var response = await client.BAPI_ALM_ORDER_GET_DETAILAsync(request);
-        //}
 
         /// <summary>
         /// Entry point for the task

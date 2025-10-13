@@ -1,8 +1,9 @@
-﻿using Thermo.SampleManager.Library;
+﻿using CoreWCF.OpenApi.Attributes;
 using CoreWCF.Web;
-using CoreWCF.OpenApi.Attributes;
+using CustomizationWebApi.Connected_Services.GetOrderDetail;
 using CustomizationWebApi.FTI.APIRequests;
-using CustomizationWebApi.Client;
+using Newtonsoft.Json;
+using Thermo.SampleManager.Library;
 
 namespace CustomizationWebApi.FTI
 {
@@ -30,8 +31,8 @@ namespace CustomizationWebApi.FTI
                     throw new ArgumentException("Order number cannot be null or empty", nameof(fTIOrderDetail));
                 }
 
-                ProcessSoapClient(fTIOrderDetail.OrderNumber).Wait();
-            
+                ProcessOrder(fTIOrderDetail.OrderNumber).Wait();
+
                 return true;
             }
             catch (Exception ex)
@@ -42,27 +43,47 @@ namespace CustomizationWebApi.FTI
             }
         }
 
-        private async Task ProcessSoapClient(string orderNumber)
+        //private async Task ProcessSoapClient(string orderNumber)
+        //{
+        //    ZLIMS_BAPI_ALM_ORD_GET_DETAILClient client = new();
+
+        //    BAPI_ALM_ORDER_GET_DETAIL request = new BAPI_ALM_ORDER_GET_DETAIL
+        //    {
+        //        NUMBER = orderNumber,
+        //        RETURN = new List<BAPIRET2>().ToArray()
+        //    };
+
+        //    Logger.Error($"Sending request to BAPI for order: {orderNumber}");
+        //    var response = await client.BAPI_ALM_ORDER_GET_DETAILAsync(request);
+
+        //    if (response == null)
+        //    {
+        //        Logger.Error("Received null response from BAPI");
+        //        throw new InvalidOperationException("BAPI returned null response");
+        //    }
+
+        //    Logger.Error($"Successfully retrieved order details for order: {orderNumber}");
+        //    Logger.Debug($"BAPI Response: {response}");
+        //}
+
+        private async Task ProcessOrder(string OrderNumber)
         {
-            ZLIMS_BAPI_ALM_ORD_GET_DETAILClient client = new();
+            GetOrderDetail getOrderDetail = new GetOrderDetail(Library, EntityManager, Logger, OrderNumber);
 
-            BAPI_ALM_ORDER_GET_DETAIL request = new BAPI_ALM_ORDER_GET_DETAIL
+            try
             {
-                NUMBER = orderNumber,
-                RETURN = new List<BAPIRET2>().ToArray()
-            };
+                string fullURL = $"https://citscpicfdev.it-cpi001-rt.cfapps.eu10.hana.ondemand.com/http/thermofisher/order/{OrderNumber}";
 
-            Logger.Error($"Sending request to BAPI for order: {orderNumber}");
-            var response = await client.BAPI_ALM_ORDER_GET_DETAILAsync(request);
+                string jsonString = await getOrderDetail.GetRequestAsync(fullURL);
 
-            if (response == null)
-            {
-                Logger.Error("Received null response from BAPI");
-                throw new InvalidOperationException("BAPI returned null response");
+                Logger.Error(JsonConvert.SerializeObject(jsonString, Formatting.Indented));
+                JsonConvert.DeserializeObject<Rootobject>(jsonString);
+
             }
-
-            Logger.Error($"Successfully retrieved order details for order: {orderNumber}");
-            Logger.Debug($"BAPI Response: {response}");
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
         #endregion
     }
